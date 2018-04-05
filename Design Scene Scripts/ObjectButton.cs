@@ -28,6 +28,12 @@ public class ObjectButton : MonoBehaviour {
     private float AbsHeight = 0;
     private bool IsOpen = false;
 
+    // This part is used to store some extra original information of Fire object;
+    private float HRRPUA;
+    private float CO_YIELD;
+    private float SOOT_YIELD;
+    private string FUEL;
+
     public void SetOriginalInfo(string name = null, float xp = 0, float yp = 0, float zp = 0,
         float xr = 0, float yr = 0, float zr = 0, float l = 1, float w = 1, float h = 1, 
         float o = 1)
@@ -83,6 +89,15 @@ public class ObjectButton : MonoBehaviour {
                 AbsWidth = wallAttachedTo.transform.localScale.x * LinkedGameObject.transform.localScale.x;
                 AbsHeight = wallAttachedTo.transform.localScale.y * LinkedGameObject.transform.localScale.y;
                 IsOpen = LinkedGameObject.GetComponent<Door>().Open;
+            }
+
+            // Store some variables for fire object
+            if (LinkedGameObject.tag == "Fire")
+            {
+                HRRPUA = LinkedGameObject.GetComponent<Fire>().HRRPUA;
+                CO_YIELD = LinkedGameObject.GetComponent<Fire>().CO_YIELD;
+                SOOT_YIELD = LinkedGameObject.GetComponent<Fire>().SOOT_YIELD;
+                FUEL = LinkedGameObject.GetComponent<Fire>().FUEL;
             }
 
             if (LinkedGameObject.tag == "Wall" || LinkedGameObject.tag == "Floor" ||
@@ -166,6 +181,60 @@ public class ObjectButton : MonoBehaviour {
                     else if (inputfield.name == "Relative Position")
                     {
                         inputfield.text = RelativePosition.ToString();
+                    }
+                }
+                Toggle OpenToggle = RelatedPanel.GetComponentInChildren<Toggle>();
+                OpenToggle.isOn = IsOpen;
+            }
+            else if (LinkedGameObject.tag == "Fire")
+            {
+                InputField[] AllInputFields = RelatedPanel.GetComponentsInChildren<InputField>();
+                foreach (InputField inputfield in AllInputFields)
+                {
+                    if (inputfield.name == "Name")
+                    {
+                        inputfield.text = OriginalName;
+                    }
+                    else if (inputfield.name == "x position")
+                    {
+                        inputfield.text = LinkedGameObject.transform.position.x.ToString();
+                    }
+                    else if (inputfield.name == "y position")
+                    {
+                        inputfield.text = LinkedGameObject.transform.position.z.ToString();
+                    }
+                    else if (inputfield.name == "z position")
+                    {
+                        inputfield.text = LinkedGameObject.transform.position.y.ToString();
+                    }
+                    else if (inputfield.name == "Width")
+                    {
+                        inputfield.text = width.ToString();
+                    }
+                    else if (inputfield.name == "Length")
+                    {
+                        inputfield.text = width.ToString();
+                    }
+                    else if (inputfield.name == "HRRPUA")
+                    {
+                        inputfield.text = HRRPUA.ToString();
+                    }
+                    else if (inputfield.name == "CO YIELD")
+                    {
+                        inputfield.text = CO_YIELD.ToString();
+                    }
+                    else if (inputfield.name == "SOOT YIELD")
+                    {
+                        inputfield.text = SOOT_YIELD.ToString();
+                    }
+                }
+                Dropdown Fuel = RelatedPanel.GetComponentInChildren<Dropdown>();
+                for (int i = 0; i < Fuel.options.Count; i++)
+                {
+                    if (Fuel.options[i].text == FUEL)
+                    {
+                        Fuel.value = i;
+                        break;
                     }
                 }
             }
