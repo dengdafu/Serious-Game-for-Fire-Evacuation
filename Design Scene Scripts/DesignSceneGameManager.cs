@@ -7,6 +7,19 @@ public class DesignSceneGameManager : MonoBehaviour {
 
     GameObject[] panels;
     public List<GameObject> AllScenes;
+    public struct SceneSimInfo
+    {
+        public bool Assigned;
+        public float SimulationTime, TimeStep, GridSize;
+        public SceneSimInfo(bool assigned,  float SimTime, float timeStep, float gridSize)
+        {
+            Assigned = assigned;
+            SimulationTime = SimTime;
+            TimeStep = timeStep;
+            GridSize = gridSize;
+        }
+    }
+    public List<SceneSimInfo> AllSceneSimInfo;
 
     public Text Header;
 
