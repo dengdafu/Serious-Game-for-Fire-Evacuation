@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ToolBoxDoorButton : MonoBehaviour {
 
@@ -8,7 +6,7 @@ public class ToolBoxDoorButton : MonoBehaviour {
     {
         GameObject gamemanager = GameObject.FindGameObjectWithTag("GameManager");
 
-        // Initiate the door object and put it under the currrent scene
+        // Initiate the door object and put it under the current scene
         GameObject Object = Instantiate(Resources.Load<GameObject>("Prefabs/Door"));
         Object.transform.SetParent(gamemanager.GetComponent<DesignSceneGameManager>().GetCurrentScene().transform);
 

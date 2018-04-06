@@ -1,16 +1,16 @@
 ﻿using UnityEngine;
 
-public class ToolBoxWallButton : MonoBehaviour {
+public class ToolBoxPedestrianButton : MonoBehaviour {
 
     public void Onclick()
-    {     
+    {
         GameObject gamemanager = GameObject.FindGameObjectWithTag("GameManager");
 
-        // Initiate the wall object and put it under the current scene
-        GameObject Object = Instantiate(Resources.Load<GameObject>("Prefabs/Wall"));
+        // Initiate the pedestrian object and put it under the current scene
+        GameObject Object = Instantiate(Resources.Load<GameObject>("Prefabs/Pedestrian"));
         Object.transform.SetParent(gamemanager.GetComponent<DesignSceneGameManager>().GetCurrentScene().transform);
 
-        // Set "TempObjectHolder" in DesignSceneGameManager to be this initiated wall
+        // Set "TempObjectHolder" in DesignSceneGameManager to be this initiated pedestrian
         gamemanager.GetComponent<DesignSceneGameManager>().SetTempObjectHolder(Object);
 
         // Set "IsExistingObject" to be false, indicating that we are not looking at a pre-created game object

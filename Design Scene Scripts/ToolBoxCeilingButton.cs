@@ -6,7 +6,7 @@ public class ToolBoxCeilingButton : MonoBehaviour {
     {
         GameObject gamemanager = GameObject.FindGameObjectWithTag("GameManager");
 
-        // Initiate the ceiling object and put it under the currrent scene
+        // Initiate the ceiling object and put it under the current scene
         GameObject Object = Instantiate(Resources.Load<GameObject>("Prefabs/Ceiling"));
         Object.transform.SetParent(gamemanager.GetComponent<DesignSceneGameManager>().GetCurrentScene().transform);
 

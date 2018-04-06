@@ -34,6 +34,11 @@ public class ObjectButton : MonoBehaviour {
     private float SOOT_YIELD;
     private string FUEL;
 
+    // This part is used to store some extra original information of Pedestrian object;
+    private string Exit = null;
+    private float Speed;
+    private float Health;
+
     public void SetOriginalInfo(string name = null, float xp = 0, float yp = 0, float zp = 0,
         float xr = 0, float yr = 0, float zr = 0, float l = 1, float w = 1, float h = 1, 
         float o = 1)
@@ -98,6 +103,15 @@ public class ObjectButton : MonoBehaviour {
                 CO_YIELD = LinkedGameObject.GetComponent<Fire>().CO_YIELD;
                 SOOT_YIELD = LinkedGameObject.GetComponent<Fire>().SOOT_YIELD;
                 FUEL = LinkedGameObject.GetComponent<Fire>().FUEL;
+            }
+
+            // Store some variable for pedestrian object
+            if (LinkedGameObject.tag == "Pedestrian")
+            {
+                GameObject exit = LinkedGameObject.GetComponent<Pedestrian>().Exit;
+                Exit = exit.name;
+                Speed = LinkedGameObject.GetComponent<Pedestrian>().Speed;
+                Health = LinkedGameObject.GetComponent<Pedestrian>().Health;
             }
 
             if (LinkedGameObject.tag == "Wall" || LinkedGameObject.tag == "Floor" ||
@@ -226,6 +240,46 @@ public class ObjectButton : MonoBehaviour {
                     else if (inputfield.name == "SOOT YIELD")
                     {
                         inputfield.text = SOOT_YIELD.ToString();
+                    }
+                }
+                Dropdown Fuel = RelatedPanel.GetComponentInChildren<Dropdown>();
+                for (int i = 0; i < Fuel.options.Count; i++)
+                {
+                    if (Fuel.options[i].text == FUEL)
+                    {
+                        Fuel.value = i;
+                        break;
+                    }
+                }
+            }
+            else if (LinkedGameObject.tag == "Pedestrian")
+            {
+                InputField[] AllInputFields = RelatedPanel.GetComponentsInChildren<InputField>();
+                foreach (InputField inputfield in AllInputFields)
+                {
+                    if (inputfield.name == "Name")
+                    {
+                        inputfield.text = OriginalName;
+                    }
+                    else if (inputfield.name == "x position")
+                    {
+                        inputfield.text = LinkedGameObject.transform.position.x.ToString();
+                    }
+                    else if (inputfield.name == "y position")
+                    {
+                        inputfield.text = LinkedGameObject.transform.position.z.ToString();
+                    }
+                    else if (inputfield.name == "Exit")
+                    {
+                        inputfield.text = Exit;
+                    }
+                    else if (inputfield.name == "Speed")
+                    {
+                        inputfield.text = Speed.ToString();
+                    }
+                    else if (inputfield.name == "Health")
+                    {
+                        inputfield.text = Health.ToString();
                     }
                 }
                 Dropdown Fuel = RelatedPanel.GetComponentInChildren<Dropdown>();

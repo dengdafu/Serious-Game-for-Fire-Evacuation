@@ -6,7 +6,7 @@ public class ToolBoxFireButton : MonoBehaviour {
     {
         GameObject gamemanager = GameObject.FindGameObjectWithTag("GameManager");
 
-        // Initiate the Fire object and put it under the currrent scene
+        // Initiate the Fire object and put it under the current scene
         GameObject Object = Instantiate(Resources.Load<GameObject>("Prefabs/Fire"));
         Object.transform.SetParent(gamemanager.GetComponent<DesignSceneGameManager>().GetCurrentScene().transform);
 

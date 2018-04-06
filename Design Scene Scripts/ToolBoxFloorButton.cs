@@ -6,7 +6,7 @@ public class ToolBoxFloorButton : MonoBehaviour {
     {
         GameObject gamemanager = GameObject.FindGameObjectWithTag("GameManager");
 
-        // Initiate the floor object and put it under the currrent scene
+        // Initiate the floor object and put it under the current scene
         GameObject Object = Instantiate(Resources.Load<GameObject>("Prefabs/Floor"));
         Object.transform.SetParent(gamemanager.GetComponent<DesignSceneGameManager>().GetCurrentScene().transform);
 
