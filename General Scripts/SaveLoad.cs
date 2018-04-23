@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Collections.Generic;
 
 public class SaveLoad : MonoBehaviour {
 
@@ -10,11 +11,24 @@ public class SaveLoad : MonoBehaviour {
 
     public void Save()
     {
-        
+        List<string> AllObjectNames;
+
+
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Open(Application.persistentDataPath + "", FileMode.Open);
     }
 
+}
+
+class SceneDetails
+{
+    public List<wall> Walls;
+    public List<floor> Floors;
+    public List<ceiling> Ceilings;
+    public List<obstacle> Obstacles;
+    public List<door> Doors;
+    public List<fire> Fires;
+    public List<pedestrian> Pedestrians;
 }
 
 [Serializable]
