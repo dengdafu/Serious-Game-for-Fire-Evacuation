@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
@@ -10,9 +9,23 @@ public class SaveLoad : MonoBehaviour {
 
     public GameObject gamemanager;
     public InputField ScenarioName;
+    public Button ScenarioButton;
     private string WorkingDirectory;
 
-    public void SaveOnClick()
+    // The following variables are used in DesignScene-related methods
+    public GameObject ObjectList;
+    public Button WallObjectExampleButton;
+    public Button FloorObjectExampleButton;
+    public Button CeilingObjectExampleButton;
+    public Button ObstacleObjectExampleButton;
+    public Button DoorObjectExampleButton;
+    public Button FireObjectExampleButton;
+    public Button PedestrianObjectExampleButton;
+
+    public GameObject SceneList;
+    public GameObject SceneButtonInstance;
+
+    public void Save()
     {
         // 1. Get the SaveName;
         string scenarioName = ScenarioName.text;
@@ -179,10 +192,10 @@ public class SaveLoad : MonoBehaviour {
 
     // Method LoadOnClick() only bring back the stored objects. Extra steps need to be taken to recover to design scene
     // and game scene accordingly.
-    public void LoadOnClick()
+    public void Load()
     {
         // 1. Set WorkingDirectory
-        WorkingDirectory = Application.persistentDataPath + "/" + ScenarioName.text;
+        WorkingDirectory = Application.persistentDataPath + "/" + ScenarioButton.name;
 
         // 2. Get a string[] contains all the subdirectories in the scenario (all the scenes)
         DirectoryInfo dir = new DirectoryInfo(WorkingDirectory);
@@ -400,6 +413,187 @@ public class SaveLoad : MonoBehaviour {
                 newPedestrian.GetComponent<Pedestrian>().Exit = GameObject.Find(AllObjectsNames[Pedestrian.ExitNameIndex]);
             }
         }
+    }
+
+    // DesignSceneSaveOnClick() method is used by the Confirm button in the save panel to save the scenario into a file 
+    public void DesignSceneSaveOnClick()
+    {
+        Save();
+    }
+
+    // DesignSceneLoadOnClick() method is used by the Confirm button in the load panel to load the selected scenario
+    public void DesignSceneLoadOnClick()
+    {
+        // When this method is called, the gamemanager is expected to be set to be DesignSceneManager
+
+        // 1. Erase all the GameObjects and their associated buttons too. Therefore, the user should always save the scenario
+        // they are working on before loading another scenario.
+        foreach (GameObject Scene in gamemanager.GetComponent<DesignSceneGameManager>().AllScenes)
+        {
+            // For each object in the scene, destory its associated button and then also destory itself.
+            foreach(Transform Object in Scene.transform)
+            {
+                // Destory the associated button
+                Destroy(Object.gameObject.GetComponent<AssociatedButton>().button);
+
+                // Destory the game object
+                Destroy(Object.gameObject);
+            }
+
+            // Then destory the scene (later assign AllScenes in DesignSceneGameManager.cs with the new list of scenes),
+            // and its associated button.
+            Destroy(Scene.GetComponentInChildren<AssociatedButton>().button);
+            Destroy(Scene);
+        }
+
+        // 2. Load in the design whose name is ScenarioButton.name
+        Load();
+
+        // 3. Fill in the variables in DesignSceneGameManager.cs based on the loaded scene
+        // 3.1 Fill in AllScenes
+        List<GameObject> AllScenes = new List<GameObject>(GameObject.FindGameObjectsWithTag("Scene"));
+        gamemanager.GetComponent<DesignSceneGameManager>().AllScenes = AllScenes;
+        // 3.2 For each game object in each scene, create button for it
+        foreach (GameObject Scene in AllScenes)
+        {
+            foreach (Transform Object in Scene.transform)
+            {
+                // 3.2.1 Wall buttons
+                if (Object.tag == "Wall")
+                {
+                    Button clone = Instantiate(WallObjectExampleButton);
+                    clone.gameObject.SetActive(true);
+                    clone.transform.SetParent(ObjectList.transform);
+                    clone.GetComponent<RectTransform>().sizeDelta = WallObjectExampleButton.GetComponent<RectTransform>().sizeDelta;
+                    clone.GetComponent<RectTransform>().localEulerAngles = WallObjectExampleButton.GetComponent<RectTransform>().localEulerAngles;
+                    clone.GetComponent<RectTransform>().localPosition = WallObjectExampleButton.GetComponent<RectTransform>().localPosition;
+                    clone.GetComponent<RectTransform>().localScale = WallObjectExampleButton.GetComponent<RectTransform>().localScale;
+                    clone.GetComponent<ObjectButton>().SetLink(Object.gameObject);
+                    clone.GetComponentInChildren<Text>().text = Object.gameObject.name;
+                    Object.gameObject.GetComponent<AssociatedButton>().button = clone.gameObject;
+                }
+                // 3.2.2 Floor buttons
+                else if (Object.tag == "Floor")
+                {
+                    Button clone = Instantiate(FloorObjectExampleButton);
+                    clone.gameObject.SetActive(true);
+                    clone.transform.SetParent(ObjectList.transform);
+                    clone.GetComponent<RectTransform>().sizeDelta = FloorObjectExampleButton.GetComponent<RectTransform>().sizeDelta;
+                    clone.GetComponent<RectTransform>().localEulerAngles = FloorObjectExampleButton.GetComponent<RectTransform>().localEulerAngles;
+                    clone.GetComponent<RectTransform>().localPosition = FloorObjectExampleButton.GetComponent<RectTransform>().localPosition;
+                    clone.GetComponent<RectTransform>().localScale = FloorObjectExampleButton.GetComponent<RectTransform>().localScale;
+                    clone.GetComponent<ObjectButton>().SetLink(Object.gameObject);
+                    clone.GetComponentInChildren<Text>().text = Object.gameObject.name;
+                    Object.gameObject.GetComponent<AssociatedButton>().button = clone.gameObject;
+                }
+                // 3.2.3 Ceiling buttons
+                else if (Object.tag == "Ceiling")
+                {
+                    Button clone = Instantiate(CeilingObjectExampleButton);
+                    clone.gameObject.SetActive(true);
+                    clone.transform.SetParent(ObjectList.transform);
+                    clone.GetComponent<RectTransform>().sizeDelta = CeilingObjectExampleButton.GetComponent<RectTransform>().sizeDelta;
+                    clone.GetComponent<RectTransform>().localEulerAngles = CeilingObjectExampleButton.GetComponent<RectTransform>().localEulerAngles;
+                    clone.GetComponent<RectTransform>().localPosition = CeilingObjectExampleButton.GetComponent<RectTransform>().localPosition;
+                    clone.GetComponent<RectTransform>().localScale = CeilingObjectExampleButton.GetComponent<RectTransform>().localScale;
+                    clone.GetComponent<ObjectButton>().SetLink(Object.gameObject);
+                    clone.GetComponentInChildren<Text>().text = Object.gameObject.name;
+                    Object.gameObject.GetComponent<AssociatedButton>().button = clone.gameObject;
+                }
+                // 3.2.4 Obstacle buttons
+                else if (Object.tag == "Obstacle")
+                {
+                    Button clone = Instantiate(ObstacleObjectExampleButton);
+                    clone.gameObject.SetActive(true);
+                    clone.transform.SetParent(ObjectList.transform);
+                    clone.GetComponent<RectTransform>().sizeDelta = ObstacleObjectExampleButton.GetComponent<RectTransform>().sizeDelta;
+                    clone.GetComponent<RectTransform>().localEulerAngles = ObstacleObjectExampleButton.GetComponent<RectTransform>().localEulerAngles;
+                    clone.GetComponent<RectTransform>().localPosition = ObstacleObjectExampleButton.GetComponent<RectTransform>().localPosition;
+                    clone.GetComponent<RectTransform>().localScale = ObstacleObjectExampleButton.GetComponent<RectTransform>().localScale;
+                    clone.GetComponent<ObjectButton>().SetLink(Object.gameObject);
+                    clone.GetComponentInChildren<Text>().text = Object.gameObject.name;
+                    Object.gameObject.GetComponent<AssociatedButton>().button = clone.gameObject;
+                }
+                // 3.2.5 Door buttons
+                else if (Object.tag == "Door")
+                {
+                    Button clone = Instantiate(DoorObjectExampleButton);
+                    clone.gameObject.SetActive(true);
+                    clone.transform.SetParent(ObjectList.transform);
+                    clone.GetComponent<RectTransform>().sizeDelta = DoorObjectExampleButton.GetComponent<RectTransform>().sizeDelta;
+                    clone.GetComponent<RectTransform>().localEulerAngles = DoorObjectExampleButton.GetComponent<RectTransform>().localEulerAngles;
+                    clone.GetComponent<RectTransform>().localPosition = DoorObjectExampleButton.GetComponent<RectTransform>().localPosition;
+                    clone.GetComponent<RectTransform>().localScale = DoorObjectExampleButton.GetComponent<RectTransform>().localScale;
+                    clone.GetComponent<ObjectButton>().SetLink(Object.gameObject);
+                    clone.GetComponentInChildren<Text>().text = Object.gameObject.name;
+                    Object.gameObject.GetComponent<AssociatedButton>().button = clone.gameObject;
+                }
+                // 3.2.6 Fire buttons
+                else if (Object.tag == "Fire")
+                {
+                    Button clone = Instantiate(FireObjectExampleButton);
+                    clone.gameObject.SetActive(true);
+                    clone.transform.SetParent(ObjectList.transform);
+                    clone.GetComponent<RectTransform>().sizeDelta = FireObjectExampleButton.GetComponent<RectTransform>().sizeDelta;
+                    clone.GetComponent<RectTransform>().localEulerAngles = FireObjectExampleButton.GetComponent<RectTransform>().localEulerAngles;
+                    clone.GetComponent<RectTransform>().localPosition = FireObjectExampleButton.GetComponent<RectTransform>().localPosition;
+                    clone.GetComponent<RectTransform>().localScale = FireObjectExampleButton.GetComponent<RectTransform>().localScale;
+                    clone.GetComponent<ObjectButton>().SetLink(Object.gameObject);
+                    clone.GetComponentInChildren<Text>().text = Object.gameObject.name;
+                    Object.gameObject.GetComponent<AssociatedButton>().button = clone.gameObject;
+                }
+                // 3.2.7 Pedestrian buttons
+                else if (Object.tag == "Pedestrian")
+                {
+                    Button clone = Instantiate(PedestrianObjectExampleButton);
+                    clone.gameObject.SetActive(true);
+                    clone.transform.SetParent(ObjectList.transform);
+                    clone.GetComponent<RectTransform>().sizeDelta = PedestrianObjectExampleButton.GetComponent<RectTransform>().sizeDelta;
+                    clone.GetComponent<RectTransform>().localEulerAngles = PedestrianObjectExampleButton.GetComponent<RectTransform>().localEulerAngles;
+                    clone.GetComponent<RectTransform>().localPosition = PedestrianObjectExampleButton.GetComponent<RectTransform>().localPosition;
+                    clone.GetComponent<RectTransform>().localScale = PedestrianObjectExampleButton.GetComponent<RectTransform>().localScale;
+                    clone.GetComponent<ObjectButton>().SetLink(Object.gameObject);
+                    clone.GetComponentInChildren<Text>().text = Object.gameObject.name;
+                    Object.gameObject.GetComponent<AssociatedButton>().button = clone.gameObject;
+                }
+            }
+        }
+
+        // 3.3 Create button for all scenes, also attach AssociatedButton.cs to the scene object
+        foreach (GameObject Scene in AllScenes)
+        {
+            // Attach AssociatedButton.cs to it
+            Scene.AddComponent<AssociatedButton>();
+
+            GameObject NewSceneButton = Instantiate(SceneButtonInstance);
+            NewSceneButton.SetActive(true);
+            NewSceneButton.transform.SetParent(SceneList.transform);
+            NewSceneButton.GetComponentInChildren<Text>().text = Scene.name;
+            NewSceneButton.transform.position = SceneButtonInstance.transform.position;
+            NewSceneButton.transform.localEulerAngles = SceneButtonInstance.transform.localEulerAngles;
+            NewSceneButton.transform.localScale = SceneButtonInstance.transform.localScale;
+            Scene.GetComponent<AssociatedButton>().button = NewSceneButton;
+        }
+
+        // 3.4 Let only the first scene in AllScenes be active.
+        // Disable all other scenes and all their related game objects and buttons
+        int i = 1;
+        do
+        {
+            foreach (Transform Object in AllScenes[i].transform)
+            {
+                Object.gameObject.GetComponent<AssociatedButton>().button.SetActive(false);
+            }
+            AllScenes[i].SetActive(false);
+            i++;
+        }
+        while (i < AllScenes.Count);
+
+        // 3.5 In DesignSceneGameManager, set TempObjectHolder = first scene, CurrentScene = first scene,
+        // LastClickedButton = null;
+        gamemanager.GetComponent<DesignSceneGameManager>().SetTempObjectHolder(AllScenes[0]);
+        gamemanager.GetComponent<DesignSceneGameManager>().SetCurrentScene(AllScenes[0]);
+        gamemanager.GetComponent<DesignSceneGameManager>().SetLastClickedButton(null);
     }
 }
 
