@@ -9,6 +9,8 @@ public class ToolBoxSceneButton : MonoBehaviour {
         // Create an empty game object, called "Unnamed scene"
         GameObject scene = new GameObject("Unnamed scene");
         scene.AddComponent<AssociatedButton>();
+        scene.AddComponent<SceneInfo>();
+        scene.tag = "Scene";
 
         // Set "TempObjectHolder" in DesignSceneGameManager to be this initiated wall
         gamemanager.GetComponent<DesignSceneGameManager>().SetTempObjectHolder(scene);

@@ -29,10 +29,10 @@ public class SaveLoad : MonoBehaviour {
         Directory.CreateDirectory(WorkingDirectory);
 
         // 4. For each scene, do the followings
-        for (int i = 0; i < AllScenes.Count; i++)
+        foreach (GameObject Scene in AllScenes)
         {
             // 4.1 create a sub-folder with the scene name
-            WorkingDirectory = Application.persistentDataPath + scenarioName + AllScenes[i].name;
+            WorkingDirectory = Application.persistentDataPath + "/" + scenarioName +  "/" + Scene.name;
             Directory.CreateDirectory(WorkingDirectory);
 
             // 4.2 create a list to store all the names of the objects
@@ -41,11 +41,11 @@ public class SaveLoad : MonoBehaviour {
             // 4.3 Fill in the class SceneDetails according to the design of the scene
             SceneDetails sceneDetails = new SceneDetails();
             // 4.3.1 Fill in the simulation info
-            sceneDetails.SimTime = gamemanager.GetComponent<DesignSceneGameManager>().AllSceneSimInfo[i].SimulationTime;
-            sceneDetails.TimeStep = gamemanager.GetComponent<DesignSceneGameManager>().AllSceneSimInfo[i].TimeStep;
-            sceneDetails.GridSize = gamemanager.GetComponent<DesignSceneGameManager>().AllSceneSimInfo[i].GridSize;
+            sceneDetails.SimTime = Scene.GetComponent<SceneInfo>().SimulationTime;
+            sceneDetails.TimeStep = Scene.GetComponent<SceneInfo>().TimeStep;
+            sceneDetails.GridSize = Scene.GetComponent<SceneInfo>().GridSize;
             // 4.3.2 fill in the info of different objects into sceneDetails
-            foreach (Transform ChildObjectTransform in AllScenes[i].transform)
+            foreach (Transform ChildObjectTransform in Scene.transform)
             {
                 // Wall and its doors
                 if (ChildObjectTransform.tag == "Wall")
@@ -55,7 +55,7 @@ public class SaveLoad : MonoBehaviour {
                     WallInfo.NameIndex = AllObjectNames.Count;
                     WallInfo.xpos = ChildObjectTransform.position.x;
                     WallInfo.ypos = ChildObjectTransform.position.z;
-                    WallInfo.zrot = ChildObjectTransform.rotation.y;
+                    WallInfo.zrot = ChildObjectTransform.eulerAngles.y;
                     WallInfo.Width = ChildObjectTransform.localScale.x;
                     WallInfo.Height = ChildObjectTransform.localScale.y;
                     WallInfo.Opacity = ChildObjectTransform.GetComponent<Renderer>().material.color.a;
@@ -110,8 +110,6 @@ public class SaveLoad : MonoBehaviour {
                     CeilingInfo.zpos = ChildObjectTransform.position.y;
                     CeilingInfo.Width = ChildObjectTransform.localScale.x;
                     CeilingInfo.Length = ChildObjectTransform.localScale.z;
-                    // since the functionality of "open" is yet to be properly assigned, "open" = 0 for now.
-                    CeilingInfo.Open = 0;
                     CeilingInfo.Opacity = ChildObjectTransform.GetComponent<Renderer>().material.color.a;
                     sceneDetails.Ceilings.Add(CeilingInfo);
                 }
@@ -179,6 +177,230 @@ public class SaveLoad : MonoBehaviour {
         }
     }
 
+    // Method LoadOnClick() only bring back the stored objects. Extra steps need to be taken to recover to design scene
+    // and game scene accordingly.
+    public void LoadOnClick()
+    {
+        // 1. Set WorkingDirectory
+        WorkingDirectory = Application.persistentDataPath + "/" + ScenarioName.text;
+
+        // 2. Get a string[] contains all the subdirectories in the scenario (all the scenes)
+        DirectoryInfo dir = new DirectoryInfo(WorkingDirectory);
+        DirectoryInfo[] subdirs = dir.GetDirectories();
+        List<string> AllScenes = new List<string>();
+        foreach (DirectoryInfo subdir in subdirs)
+        {
+            AllScenes.Add(subdir.Name);
+        }
+
+        // 3. For each scene, create a scene object and put it in AllSceneObjects
+        List<GameObject> AllSceneObjects = new List<GameObject>();
+        foreach (string Scene in AllScenes)
+        {
+            GameObject scene = new GameObject(Scene);
+            scene.tag = "Scene";
+            scene.transform.position = new Vector3(0, 0, 0);
+            scene.AddComponent<SceneInfo>();
+            AllSceneObjects.Add(scene);
+        }
+
+        // 4. For each scene, load the stored data
+        foreach (GameObject Scene in AllSceneObjects)
+        {
+            WorkingDirectory = Application.persistentDataPath + "/" + ScenarioName.text + "/" + Scene.name;
+            List<string> AllObjectsNames = new List<string>();
+
+            // 4.1 read all the names from the AllNames.txt file.
+            if (File.Exists(WorkingDirectory + "/AllNames.txt"))
+            {
+                string name;
+                StreamReader theReader = new StreamReader(WorkingDirectory + "/AllNames.txt");
+                using (theReader)
+                {
+                    do
+                    {
+                        name = theReader.ReadLine();
+                        if (name != null)
+                        {
+                            AllObjectsNames.Add(name);
+                        }
+                    }
+                    while (name != null);
+                }
+                theReader.Close();
+            }
+
+            // 4.2 read in all the details into sceneDetails (SceneDetails)
+            SceneDetails sceneDetails = new SceneDetails();
+            if (File.Exists(WorkingDirectory + "/SceneDetails.dat"))
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                FileStream file = File.Open(WorkingDirectory + "/SceneDetails.dat", FileMode.Open);
+                sceneDetails = (SceneDetails)bf.Deserialize(file);
+                file.Close();
+            }
+
+            // 4.3 Recover the scene based on sceneDetails
+            // 4.3.1 Fill in sim info. If it is in design scene, then need AddComponent<AssociatedButton>() as well.
+            Scene.GetComponent<SceneInfo>().SimulationTime = sceneDetails.SimTime;
+            Scene.GetComponent<SceneInfo>().TimeStep = sceneDetails.TimeStep;
+            Scene.GetComponent<SceneInfo>().GridSize = sceneDetails.GridSize;
+
+            // 4.3.2 Create all the walls
+            foreach (wall Wall in sceneDetails.Walls)
+            {
+                GameObject newWall = Instantiate(Resources.Load<GameObject>("Prefabs/Wall"));
+                newWall.name = AllObjectsNames[Wall.NameIndex];
+                newWall.transform.SetParent(Scene.transform);
+
+                Vector3 Pos = newWall.transform.position;
+                Pos.x = Wall.xpos; Pos.y = Wall.Height / 2; Pos.z = Wall.ypos;
+                newWall.transform.position = Pos;
+
+                Vector3 Angles = newWall.transform.eulerAngles;
+                Angles.y = Wall.zrot;
+                newWall.transform.eulerAngles = Angles;
+
+                Vector3 Scale = newWall.transform.localScale;
+                Scale.x = Wall.Width; Scale.y = Wall.Height;
+                newWall.transform.localScale = Scale;
+                
+                Vector4 color = newWall.GetComponent<Renderer>().material.color;
+                color[3] = Wall.Opacity;
+                newWall.GetComponent<Renderer>().material.color = color;
+            }
+
+            // 4.3.3 Create all the floors
+            foreach (floor Floor in sceneDetails.Floors)
+            {
+                GameObject newFloor = Instantiate(Resources.Load<GameObject>("Prefabs/Floor"));
+                newFloor.name = AllObjectsNames[Floor.NameIndex];
+                newFloor.transform.SetParent(Scene.transform);
+
+                Vector3 Pos = newFloor.transform.position;
+                Pos.x = Floor.xpos; Pos.z = Floor.ypos;
+                newFloor.transform.position = Pos;
+
+                Vector3 Scale = newFloor.transform.localScale;
+                Scale.x = Floor.Width; Scale.z = Floor.Length;
+                newFloor.transform.localScale = Scale;
+            }
+
+            // 4.3.4 Create all the ceilings
+            foreach (ceiling Ceiling in sceneDetails.Ceilings)
+            {
+                GameObject newCeiling = Instantiate(Resources.Load<GameObject>("Prefabs/Ceiling"));
+                newCeiling.name = AllObjectsNames[Ceiling.NameIndex];
+                newCeiling.transform.SetParent(Scene.transform);
+
+                Vector3 Pos = newCeiling.transform.position;
+                Pos.x = Ceiling.xpos; Pos.y = Ceiling.zpos; Pos.z = Ceiling.ypos;
+                newCeiling.transform.position = Pos;
+
+                Vector3 Scale = newCeiling.transform.localScale;
+                Scale.x = Ceiling.Width; Scale.z = Ceiling.Length;
+                newCeiling.transform.localScale = Scale;
+
+                Vector4 color = newCeiling.GetComponent<Renderer>().material.color;
+                color[3] = Ceiling.Opacity;
+                newCeiling.GetComponent<Renderer>().material.color = color;
+            }
+
+            // 4.3.5 Create all the obstacles
+            foreach (obstacle Obstacle in sceneDetails.Obstacles)
+            {
+                GameObject newObstacle = Instantiate(Resources.Load<GameObject>("Prefabs/Obstacle"));
+                newObstacle.name = AllObjectsNames[Obstacle.NameIndex];
+                newObstacle.transform.SetParent(Scene.transform);
+
+                Vector3 Pos = newObstacle.transform.position;
+                Pos.x = Obstacle.xpos; Pos.z = Obstacle.ypos;
+                newObstacle.transform.position = Pos;
+
+                Vector3 Scale = newObstacle.transform.localScale;
+                Scale.x = Obstacle.Width; Scale.y = Obstacle.Height;  Scale.z = Obstacle.Length;
+                newObstacle.transform.localScale = Scale;
+
+                Vector4 color = newObstacle.GetComponent<Renderer>().material.color;
+                color[3] = Obstacle.Opacity;
+                newObstacle.GetComponent<Renderer>().material.color = color;
+            }
+
+            // 4.3.6 Create all the doors
+            foreach (door Door in sceneDetails.Doors)
+            {
+                GameObject newDoor = Instantiate(Resources.Load<GameObject>("Prefabs/Door"));
+                newDoor.name = AllObjectsNames[Door.NameIndex];
+
+                newDoor.GetComponent<Door>().WallAttachedTo = GameObject.Find(AllObjectsNames[Door.WallNameIndex]);
+
+                newDoor.transform.SetParent(newDoor.GetComponent<Door>().WallAttachedTo.transform);
+
+                foreach (GameObject sceneobj in AllSceneObjects)
+                {
+                    if (sceneobj.name == AllObjectsNames[Door.SceneNameIndex])
+                    {
+                        newDoor.GetComponent<Door>().NextScene = sceneobj;
+                        break;
+                    }
+                }
+
+                if (Door.Open == 1)
+                {
+                    newDoor.GetComponent<Door>().Open = true;
+                }
+                else
+                {
+                    newDoor.GetComponent<Door>().Open = false;
+                }
+
+                Vector3 Pos = newDoor.transform.localPosition;
+                Pos.x = Door.RelativePosition;
+                newDoor.transform.localPosition = Pos;
+
+                Vector3 Scale = newDoor.transform.localScale;
+                Scale.x = Door.Width; Scale.y = Door.Height;
+                newDoor.transform.localScale = Scale;
+            }
+
+            // 4.3.7 Create all the fires
+            foreach (fire Fire in sceneDetails.Fires)
+            {
+                GameObject newFire = Instantiate(Resources.Load<GameObject>("Prefabs/Fire"));
+                newFire.name = AllObjectsNames[Fire.NameIndex];
+                newFire.transform.SetParent(Scene.transform);
+
+                Vector3 Pos = newFire.transform.position;
+                Pos.x = Fire.xpos; Pos.y = Fire.zpos; Pos.z = Fire.ypos;
+                newFire.transform.position = Pos;
+
+                Vector3 Scale = newFire.transform.localScale;
+                Scale.x = Fire.Width; Scale.z = Fire.Length;
+                newFire.transform.localScale = Scale;
+
+                newFire.GetComponent<Fire>().HRRPUA = Fire.HRRPUA;
+                newFire.GetComponent<Fire>().FUEL = newFire.GetComponent<Fire>().Fuels[Fire.Fuel];
+                newFire.GetComponent<Fire>().CO_YIELD = Fire.CO_YIELD;
+                newFire.GetComponent<Fire>().SOOT_YIELD = Fire.SOOT_YIELD;
+            }
+
+            // 4.3.8 Create all the pedestrians
+            foreach (pedestrian Pedestrian in sceneDetails.Pedestrians)
+            {
+                GameObject newPedestrian = Instantiate(Resources.Load<GameObject>("Prefabs/Pedestrian"));
+                newPedestrian.name = AllObjectsNames[Pedestrian.NameIndex];
+                newPedestrian.transform.SetParent(Scene.transform);
+
+                Vector3 Pos = newPedestrian.transform.position;
+                Pos.x = Pedestrian.xpos; Pos.z = Pedestrian.ypos;
+                newPedestrian.transform.position = Pos;
+
+                newPedestrian.GetComponent<Pedestrian>().Speed = Pedestrian.Speed;
+                newPedestrian.GetComponent<Pedestrian>().Health = Pedestrian.Health;
+                newPedestrian.GetComponent<Pedestrian>().Exit = GameObject.Find(AllObjectsNames[Pedestrian.ExitNameIndex]);
+            }
+        }
+    }
 }
 
 [Serializable]
@@ -226,7 +448,6 @@ class ceiling
     public float ypos;
     public float zpos;
     public float Opacity;
-    public int Open;
     public float Width;
     public float Length;
 }
