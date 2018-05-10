@@ -2,7 +2,7 @@
 
 public class SceneInfo : MonoBehaviour {
 
-    public float SimulationTime;
-    public float TimeStep;
-    public float GridSize;
+    public float SimulationTime = 0;
+    public float TimeStep = 0;
+    public float GridSize = 0;
 }

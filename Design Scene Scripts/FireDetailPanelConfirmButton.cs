@@ -23,8 +23,6 @@ public class FireDetailPanelConfirmButton : MonoBehaviour {
         float HRRPUA = 0;
         float CO_YIELD = 0;
         float SOOT_YIELD = 0;
-        float Width = 1;
-        float Length = 1;
         int FuelValue = 0;
 
         foreach (InputField inputfield in InputFields)
@@ -50,22 +48,6 @@ public class FireDetailPanelConfirmButton : MonoBehaviour {
                 try
                 {
                     SOOT_YIELD = float.Parse(inputfield.text);
-                }
-                catch { }
-            }
-            else if (inputfield.name == "Width")
-            {
-                try
-                {
-                    Width = float.Parse(inputfield.text);
-                }
-                catch { }
-            }
-            else if (inputfield.name == "Length")
-            {
-                try
-                {
-                    Length = float.Parse(inputfield.text);
                 }
                 catch { }
             }

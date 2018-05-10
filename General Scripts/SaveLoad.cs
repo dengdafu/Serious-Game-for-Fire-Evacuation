@@ -39,12 +39,18 @@ public class SaveLoad : MonoBehaviour {
 
         // 3. Create a folder named with savename.
         WorkingDirectory = Application.persistentDataPath + "/" + scenarioName;
+        // If there already exists a scenario with scenarioName, replace it with the new one. Therefore,
+        // users should make sure not to use the same scenario name
+        if (Directory.Exists(WorkingDirectory))
+        {
+            Directory.Delete(WorkingDirectory, true);
+        }
         Directory.CreateDirectory(WorkingDirectory);
 
         // 4. For each scene, do the followings
         foreach (GameObject Scene in AllScenes)
         {
-            // 4.1 create a sub-folder with the scene name
+            // 4.1 create a sub-folder with the scenarioName name
             WorkingDirectory = Application.persistentDataPath + "/" + scenarioName +  "/" + Scene.name;
             Directory.CreateDirectory(WorkingDirectory);
 
@@ -53,6 +59,13 @@ public class SaveLoad : MonoBehaviour {
 
             // 4.3 Fill in the class SceneDetails according to the design of the scene
             SceneDetails sceneDetails = new SceneDetails();
+            sceneDetails.Walls = new List<wall>();
+            sceneDetails.Floors = new List<floor>();
+            sceneDetails.Ceilings = new List<ceiling>();
+            sceneDetails.Obstacles = new List<obstacle>();
+            sceneDetails.Doors = new List<door>();
+            sceneDetails.Fires = new List<fire>();
+            sceneDetails.Pedestrians = new List<pedestrian>();
             // 4.3.1 Fill in the simulation info
             sceneDetails.SimTime = Scene.GetComponent<SceneInfo>().SimulationTime;
             sceneDetails.TimeStep = Scene.GetComponent<SceneInfo>().TimeStep;
@@ -184,7 +197,7 @@ public class SaveLoad : MonoBehaviour {
 
             // 4.5 Save sceneDetails into a binary file, SceneDetails.dat
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(WorkingDirectory + "/SceneDetails.dat", FileMode.Open);
+            FileStream file = File.Open(WorkingDirectory + "/SceneDetails.dat", FileMode.OpenOrCreate);
             bf.Serialize(file, sceneDetails);
             file.Close();
         }
