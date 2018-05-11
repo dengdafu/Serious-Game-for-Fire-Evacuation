@@ -27,6 +27,14 @@ public class SceneDetailPanelConfirmButton : MonoBehaviour {
         {
             foreach (Transform child in CurrentScene.transform)
             {
+                // If it is a wall, first deactivate its doors, then deactivate itself
+                if (child.tag == "Wall")
+                {
+                    foreach (Transform door in child)
+                    {
+                        door.gameObject.GetComponent<AssociatedButton>().button.SetActive(false);
+                    }
+                }
                 child.gameObject.GetComponent<AssociatedButton>().button.SetActive(false);
             }
             CurrentScene.SetActive(false);

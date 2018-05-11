@@ -28,8 +28,8 @@ public class SceneDetailPanelDestroyButton : MonoBehaviour {
             List<GameObject> TempAllScenes = gamemanager.GetComponent<DesignSceneGameManager>().AllScenes;
             TempAllScenes.Remove(CurrentObject);
             gamemanager.GetComponent<DesignSceneGameManager>().AllScenes = TempAllScenes;
+            Destroy(CurrentObject.GetComponent<AssociatedButton>().button);
             Destroy(CurrentObject);
-            Destroy(LastClickedButton);
         }
 
         // after destroying the button, disable all the tool buttons except the new scene button
