@@ -704,7 +704,7 @@ public class SaveLoad : MonoBehaviour {
 }
 
 [Serializable]
-class SceneDetails
+public class SceneDetails
 {
     public float SimTime;
     public float TimeStep;
@@ -719,7 +719,7 @@ class SceneDetails
 }
 
 [Serializable]
-class wall
+public class wall
 {
     public int NameIndex;
     public float xpos;
@@ -731,7 +731,7 @@ class wall
 }
 
 [Serializable]
-class floor
+public class floor
 {
     public int NameIndex;
     public float xpos;
@@ -741,7 +741,7 @@ class floor
 }
 
 [Serializable]
-class ceiling
+public class ceiling
 {
     public int NameIndex;
     public float xpos;
@@ -753,7 +753,7 @@ class ceiling
 }
 
 [Serializable]
-class obstacle
+public class obstacle
 {
     public int NameIndex;
     public float xpos;
@@ -765,7 +765,7 @@ class obstacle
 }
 
 [Serializable]
-class door
+public class door
 {
     public int NameIndex;
     public int WallNameIndex;
@@ -777,7 +777,7 @@ class door
 }
 
 [Serializable]
-class fire
+public class fire
 {
     public int NameIndex;
     public float xpos;
@@ -792,7 +792,7 @@ class fire
 }
 
 [Serializable]
-class pedestrian
+public class pedestrian
 {
     public int NameIndex;
     public float xpos;
