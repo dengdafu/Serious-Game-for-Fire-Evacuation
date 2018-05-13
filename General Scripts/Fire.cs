@@ -26,9 +26,21 @@ public class Fire : MonoBehaviour {
                              "WATER VAPOR"};
 
     // Some variables that charactorize the fire.
+    public string Name;
+    public float x_pos;
+    public float y_pos;
+    public float z_pos;
+    public float Width;
+    public float Length;
     public float HRRPUA;
     public float CO_YIELD;
     public float SOOT_YIELD;
-
     public string FUEL;
+
+    public void FillInfo(string name, float xpos, float ypos, float zpos, float width, float length,
+        float hrrpua, float co_yield, float soot_yield, string fuel)
+    {
+        Name = name; x_pos = xpos; y_pos = ypos; z_pos = zpos; Width = width; Length = length;
+        HRRPUA = hrrpua; CO_YIELD = co_yield; SOOT_YIELD = soot_yield; FUEL = fuel;
+    }
 }

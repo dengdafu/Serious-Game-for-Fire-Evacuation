@@ -9,8 +9,19 @@ public class FireDetailPanelConfirmButton : MonoBehaviour {
     public GameObject DetailPanel;
     public GameObject OpenPanel;
     public GameObject ClosePanel;
-    public Dropdown Fuel;
+    // public Dropdown Fuel;
     public Button CancelButton;
+
+    public InputField Name;
+    public Dropdown Fuel;
+    public InputField xpos;
+    public InputField ypos;
+    public InputField zpos;
+    public InputField Width;
+    public InputField Length;
+    public InputField HRRPUA;
+    public InputField SOOT_YIELD;
+    public InputField CO_YIELD;
 
     public void OnClick()
     {
@@ -18,47 +29,21 @@ public class FireDetailPanelConfirmButton : MonoBehaviour {
         GameObject CurrentObject = gamemanager.GetComponent<DesignSceneGameManager>().GetTempObjectHolder();
         GameObject lastClickedButton = gamemanager.GetComponent<DesignSceneGameManager>().GetLastClickedButton();
 
-        InputField[] InputFields = DetailPanel.GetComponentsInChildren<InputField>();
-        Dropdown FuelDropdown = DetailPanel.GetComponentInChildren<Dropdown>();
-        float HRRPUA = 0;
-        float CO_YIELD = 0;
-        float SOOT_YIELD = 0;
-        int FuelValue = 0;
-
-        foreach (InputField inputfield in InputFields)
-        {
-            if (inputfield.name == "HRRPUA")
-            {
-                try
-                {
-                    HRRPUA = float.Parse(inputfield.text);
-                }
-                catch { }
-            }
-            else if (inputfield.name == "CO YIELD")
-            {
-                try
-                {
-                    CO_YIELD = float.Parse(inputfield.text);
-                }
-                catch { }
-            }
-            else if (inputfield.name == "SOOT YIELD")
-            {
-                try
-                {
-                    SOOT_YIELD = float.Parse(inputfield.text);
-                }
-                catch { }
-            }
-        }
-        FuelValue = FuelDropdown.value;
+        string name = Name.text;
+        int FuelValue = Fuel.value;
+        string fuel = Fuel.options[FuelValue].text;
+        float x_pos = float.Parse(xpos.text);
+        float y_pos = float.Parse(ypos.text);
+        float z_pos = float.Parse(zpos.text);
+        float hrrpua = float.Parse(HRRPUA.text);
+        float width = float.Parse(Width.text);
+        float length = float.Parse(Length.text);
+        float soot_yield = float.Parse(SOOT_YIELD.text);
+        float co_yield = float.Parse(CO_YIELD.text);
 
         // Set variables in Fire.cs
-        CurrentObject.GetComponent<Fire>().HRRPUA = HRRPUA;
-        CurrentObject.GetComponent<Fire>().CO_YIELD = CO_YIELD;
-        CurrentObject.GetComponent<Fire>().SOOT_YIELD = SOOT_YIELD;
-        CurrentObject.GetComponent<Fire>().FUEL = FuelDropdown.options[FuelValue].text;
+        CurrentObject.GetComponent<Fire>().FillInfo(name, x_pos, y_pos, z_pos, width, length,
+            hrrpua, co_yield, soot_yield, fuel);
 
         // only if the object currently being designed is not an existing object, should a button be
         // added to the object list, otherwise, just use the pre-existed button with the updated name.

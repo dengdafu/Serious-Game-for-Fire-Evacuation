@@ -15,11 +15,11 @@ public class SceneButton : MonoBehaviour {
         if (LinkedGameObject != null)
         {
             GameObject gamemanager = GameObject.FindGameObjectWithTag("GameManager");
-            OriginalName = LinkedGameObject.name;
-            NameField.text = LinkedGameObject.name;
             gamemanager.GetComponent<DesignSceneGameManager>().SetTempObjectHolder(LinkedGameObject);
             gamemanager.GetComponent<DesignSceneGameManager>().SetIsExistingObject(true);
             gamemanager.GetComponent<DesignSceneGameManager>().SetLastClickedButton(this.gameObject);
+            OriginalName = LinkedGameObject.name;
+            NameField.text = LinkedGameObject.name;
 
             // Load info into the scene detail panel
             InputField[] AllInputFields = RelatedPanel.GetComponentsInChildren<InputField>();

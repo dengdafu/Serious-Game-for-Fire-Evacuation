@@ -62,6 +62,13 @@ public class SceneDetailPanelConfirmButton : MonoBehaviour {
             CurrentObject.GetComponent<AssociatedButton>().button.GetComponentInChildren<Text>().text = CurrentObject.name;
             foreach (Transform child in CurrentObject.transform)
             {
+                if (child.tag == "Wall")
+                {
+                    foreach (Transform door in child.transform)
+                    {
+                        door.gameObject.GetComponent<AssociatedButton>().button.SetActive(true);
+                    }
+                }
                 child.gameObject.GetComponent<AssociatedButton>().button.SetActive(true);
             }
 

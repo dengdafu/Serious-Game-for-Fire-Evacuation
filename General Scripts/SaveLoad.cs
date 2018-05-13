@@ -78,28 +78,30 @@ public class SaveLoad : MonoBehaviour {
                 if (ChildObjectTransform.tag == "Wall")
                 {
                     wall WallInfo = new wall();
-                    AllObjectNames.Add(ChildObjectTransform.gameObject.name);
-                    WallInfo.NameIndex = AllObjectNames.Count;
-                    WallInfo.xpos = ChildObjectTransform.position.x;
-                    WallInfo.ypos = ChildObjectTransform.position.z;
-                    WallInfo.zrot = ChildObjectTransform.eulerAngles.y;
-                    WallInfo.Width = ChildObjectTransform.localScale.x;
-                    WallInfo.Height = ChildObjectTransform.localScale.y;
-                    WallInfo.Opacity = ChildObjectTransform.GetComponent<Renderer>().material.color.a;
+                    Wall wallinfo = ChildObjectTransform.gameObject.GetComponent<Wall>();
+                    AllObjectNames.Add(wallinfo.Name);
+                    WallInfo.NameIndex = AllObjectNames.Count - 1;
+                    WallInfo.xpos = wallinfo.x_pos;
+                    WallInfo.ypos = wallinfo.y_pos;
+                    WallInfo.zrot = wallinfo.z_rot;
+                    WallInfo.Width = wallinfo.Width;
+                    WallInfo.Height = wallinfo.Height;
+                    WallInfo.Opacity = wallinfo.Opacity;
                     sceneDetails.Walls.Add(WallInfo);
 
                     // doors that are attached to it
-                    foreach (Transform doorTransfrom in ChildObjectTransform)
+                    foreach (Transform doorTransform in ChildObjectTransform)
                     {
-                        if (doorTransfrom.tag == "Door")
+                        if (doorTransform.tag == "Door")
                         {
                             door DoorInfo = new door();
-                            AllObjectNames.Add(doorTransfrom.gameObject.name);
-                            DoorInfo.NameIndex = AllObjectNames.Count;
-                            DoorInfo.RelativePosition = doorTransfrom.localPosition.x;
-                            DoorInfo.Width = doorTransfrom.localScale.x;
-                            DoorInfo.Height = doorTransfrom.localScale.y;
-                            if (doorTransfrom.gameObject.GetComponent<Door>().Open)
+                            Door doorinfo = doorTransform.gameObject.GetComponent<Door>();
+                            AllObjectNames.Add(doorinfo.Name);
+                            DoorInfo.NameIndex = AllObjectNames.Count - 1;
+                            DoorInfo.RelativePosition = doorinfo.RelativePosition;
+                            DoorInfo.Width = doorinfo.Width;
+                            DoorInfo.Height = doorinfo.Height;
+                            if (doorinfo.Open)
                             {
                                 DoorInfo.Open = 1;
                             }
@@ -108,8 +110,8 @@ public class SaveLoad : MonoBehaviour {
                                 DoorInfo.Open = 0;
                             }
                             DoorInfo.WallNameIndex = WallInfo.NameIndex;
-                            AllObjectNames.Add(doorTransfrom.gameObject.GetComponent<Door>().NextScene.name);
-                            DoorInfo.SceneNameIndex = AllObjectNames.Count;
+                            AllObjectNames.Add(doorinfo.NextScene.name);
+                            DoorInfo.SceneNameIndex = AllObjectNames.Count - 1;
                             sceneDetails.Doors.Add(DoorInfo);
                         }
                     }
@@ -118,72 +120,77 @@ public class SaveLoad : MonoBehaviour {
                 else if (ChildObjectTransform.tag == "Floor")
                 {
                     floor FloorInfo = new floor();
-                    AllObjectNames.Add(ChildObjectTransform.gameObject.name);
-                    FloorInfo.NameIndex = AllObjectNames.Count;
-                    FloorInfo.xpos = ChildObjectTransform.position.x;
-                    FloorInfo.ypos = ChildObjectTransform.position.z;
-                    FloorInfo.Width = ChildObjectTransform.localScale.x;
-                    FloorInfo.Length = ChildObjectTransform.localScale.z;
+                    Floor floorinfo = ChildObjectTransform.gameObject.GetComponent<Floor>();
+                    AllObjectNames.Add(floorinfo.Name);
+                    FloorInfo.NameIndex = AllObjectNames.Count - 1;
+                    FloorInfo.xpos = floorinfo.x_pos;
+                    FloorInfo.ypos = floorinfo.y_pos;
+                    FloorInfo.Width = floorinfo.Width;
+                    FloorInfo.Length = floorinfo.Length;
                     sceneDetails.Floors.Add(FloorInfo);
                 }
                 // Ceiling
                 else if (ChildObjectTransform.tag == "Ceiling")
                 {
                     ceiling CeilingInfo = new ceiling();
-                    AllObjectNames.Add(ChildObjectTransform.gameObject.name);
-                    CeilingInfo.NameIndex = AllObjectNames.Count;
-                    CeilingInfo.xpos = ChildObjectTransform.position.x;
-                    CeilingInfo.ypos = ChildObjectTransform.position.z;
-                    CeilingInfo.zpos = ChildObjectTransform.position.y;
-                    CeilingInfo.Width = ChildObjectTransform.localScale.x;
-                    CeilingInfo.Length = ChildObjectTransform.localScale.z;
-                    CeilingInfo.Opacity = ChildObjectTransform.GetComponent<Renderer>().material.color.a;
+                    Ceiling ceilinginfo = ChildObjectTransform.gameObject.GetComponent<Ceiling>();
+                    AllObjectNames.Add(ceilinginfo.Name);
+                    CeilingInfo.NameIndex = AllObjectNames.Count - 1;
+                    CeilingInfo.xpos = ceilinginfo.x_pos;
+                    CeilingInfo.ypos = ceilinginfo.y_pos;
+                    CeilingInfo.zpos = ceilinginfo.z_pos;
+                    CeilingInfo.Width = ceilinginfo.Width;
+                    CeilingInfo.Length = ceilinginfo.Length;
+                    CeilingInfo.Opacity = ceilinginfo.Opacity;
                     sceneDetails.Ceilings.Add(CeilingInfo);
                 }
                 // Obstacle
                 else if (ChildObjectTransform.tag == "Obstacle")
                 {
                     obstacle ObstacleInfo = new obstacle();
-                    AllObjectNames.Add(ChildObjectTransform.gameObject.name);
-                    ObstacleInfo.NameIndex = AllObjectNames.Count;
-                    ObstacleInfo.xpos = ChildObjectTransform.position.x;
-                    ObstacleInfo.ypos = ChildObjectTransform.position.z;
-                    ObstacleInfo.Width = ChildObjectTransform.localScale.x;
-                    ObstacleInfo.Length = ChildObjectTransform.localScale.z;
-                    ObstacleInfo.Height = ChildObjectTransform.localScale.y;
-                    ObstacleInfo.Opacity = ChildObjectTransform.GetComponent<Renderer>().material.color.a;
+                    Obstacle obstacleinfo = ChildObjectTransform.gameObject.GetComponent<Obstacle>();
+                    AllObjectNames.Add(obstacleinfo.Name);
+                    ObstacleInfo.NameIndex = AllObjectNames.Count - 1;
+                    ObstacleInfo.xpos = obstacleinfo.x_pos;
+                    ObstacleInfo.ypos = obstacleinfo.y_pos;
+                    ObstacleInfo.Width = obstacleinfo.Width;
+                    ObstacleInfo.Length = obstacleinfo.Length;
+                    ObstacleInfo.Height = obstacleinfo.Height;
+                    ObstacleInfo.Opacity = obstacleinfo.Opacity;
                     sceneDetails.Obstacles.Add(ObstacleInfo);
                 }
                 // Fire
                 else if (ChildObjectTransform.tag == "Fire")
                 {
                     fire FireInfo = new fire();
-                    AllObjectNames.Add(ChildObjectTransform.gameObject.name);
-                    FireInfo.NameIndex = AllObjectNames.Count;
-                    FireInfo.xpos = ChildObjectTransform.position.x;
-                    FireInfo.ypos = ChildObjectTransform.position.z;
-                    FireInfo.zpos = ChildObjectTransform.position.y;
-                    FireInfo.Width = ChildObjectTransform.localScale.x;
-                    FireInfo.Length = ChildObjectTransform.localScale.z;
-                    FireInfo.HRRPUA = ChildObjectTransform.gameObject.GetComponent<Fire>().HRRPUA;
-                    FireInfo.CO_YIELD = ChildObjectTransform.gameObject.GetComponent<Fire>().CO_YIELD;
-                    FireInfo.SOOT_YIELD = ChildObjectTransform.gameObject.GetComponent<Fire>().SOOT_YIELD;
-                    FireInfo.Fuel = Array.IndexOf(ChildObjectTransform.gameObject.GetComponent<Fire>().Fuels,
-                        ChildObjectTransform.gameObject.GetComponent<Fire>().FUEL);
+                    Fire fireinfo = ChildObjectTransform.gameObject.GetComponent<Fire>();
+                    AllObjectNames.Add(fireinfo.Name);
+                    FireInfo.NameIndex = AllObjectNames.Count - 1;
+                    FireInfo.xpos = fireinfo.x_pos;
+                    FireInfo.ypos = fireinfo.y_pos;
+                    FireInfo.zpos = fireinfo.z_pos;
+                    FireInfo.Width = fireinfo.Width;
+                    FireInfo.Length = fireinfo.Length;
+                    FireInfo.HRRPUA = fireinfo.HRRPUA;
+                    FireInfo.CO_YIELD = fireinfo.CO_YIELD;
+                    FireInfo.SOOT_YIELD = fireinfo.SOOT_YIELD;
+                    FireInfo.Fuel = Array.IndexOf(fireinfo.Fuels,
+                        fireinfo.FUEL);
                     sceneDetails.Fires.Add(FireInfo);
                 }
                 // Pedestrian
                 else if (ChildObjectTransform.tag == "Pedestrian")
                 {
                     pedestrian PedestrianInfo = new pedestrian();
-                    AllObjectNames.Add(ChildObjectTransform.gameObject.name);
-                    PedestrianInfo.NameIndex = AllObjectNames.Count;
-                    PedestrianInfo.xpos = ChildObjectTransform.position.x;
-                    PedestrianInfo.ypos = ChildObjectTransform.position.z;
-                    PedestrianInfo.Speed = ChildObjectTransform.gameObject.GetComponent<Pedestrian>().Speed;
-                    PedestrianInfo.Health = ChildObjectTransform.gameObject.GetComponent<Pedestrian>().Health;
-                    AllObjectNames.Add(ChildObjectTransform.gameObject.GetComponent<Pedestrian>().Exit.name);
-                    PedestrianInfo.ExitNameIndex = AllObjectNames.Count;
+                    Pedestrian pedestrianinfo = ChildObjectTransform.gameObject.GetComponent<Pedestrian>();
+                    AllObjectNames.Add(pedestrianinfo.Name);
+                    PedestrianInfo.NameIndex = AllObjectNames.Count - 1;
+                    PedestrianInfo.xpos = pedestrianinfo.x_pos;
+                    PedestrianInfo.ypos = pedestrianinfo.y_pos;
+                    PedestrianInfo.Speed = pedestrianinfo.Speed;
+                    PedestrianInfo.Health = pedestrianinfo.Health;
+                    AllObjectNames.Add(pedestrianinfo.Exit.name);
+                    PedestrianInfo.ExitNameIndex = AllObjectNames.Count - 1;
                     sceneDetails.Pedestrians.Add(PedestrianInfo);
                 }
             }
@@ -277,23 +284,26 @@ public class SaveLoad : MonoBehaviour {
             foreach (wall Wall in sceneDetails.Walls)
             {
                 GameObject newWall = Instantiate(Resources.Load<GameObject>("Prefabs/Wall"));
-                newWall.name = AllObjectsNames[Wall.NameIndex - 1];
+                Wall wallinfo = newWall.GetComponent<Wall>();
+                wallinfo.FillInfo(AllObjectsNames[Wall.NameIndex], Wall.xpos, Wall.ypos,
+                    Wall.zrot, Wall.Height, Wall.Width, Wall.Opacity);
+                newWall.name = wallinfo.Name;
                 newWall.transform.SetParent(Scene.transform);
 
                 Vector3 Pos = newWall.transform.position;
-                Pos.x = Wall.xpos; Pos.y = Wall.Height / 2; Pos.z = Wall.ypos;
+                Pos.x = wallinfo.x_pos; Pos.y = wallinfo.Height / 2; Pos.z = wallinfo.y_pos;
                 newWall.transform.position = Pos;
 
                 Vector3 Angles = newWall.transform.eulerAngles;
-                Angles.y = Wall.zrot;
+                Angles.y = wallinfo.z_rot;
                 newWall.transform.eulerAngles = Angles;
 
                 Vector3 Scale = newWall.transform.localScale;
-                Scale.x = Wall.Width; Scale.y = Wall.Height;
+                Scale.x = wallinfo.Width; Scale.y = wallinfo.Height;
                 newWall.transform.localScale = Scale;
                 
                 Vector4 color = newWall.GetComponent<Renderer>().material.color;
-                color[3] = Wall.Opacity;
+                color[3] = wallinfo.Opacity;
                 newWall.GetComponent<Renderer>().material.color = color;
             }
 
@@ -301,15 +311,18 @@ public class SaveLoad : MonoBehaviour {
             foreach (floor Floor in sceneDetails.Floors)
             {
                 GameObject newFloor = Instantiate(Resources.Load<GameObject>("Prefabs/Floor"));
-                newFloor.name = AllObjectsNames[Floor.NameIndex - 1];
+                Floor floorinfo = newFloor.GetComponent<Floor>();
+                floorinfo.FillInfo(AllObjectsNames[Floor.NameIndex], Floor.xpos, Floor.ypos, Floor.Length,
+                    Floor.Width);
+                newFloor.name = floorinfo.Name;
                 newFloor.transform.SetParent(Scene.transform);
 
                 Vector3 Pos = newFloor.transform.position;
-                Pos.x = Floor.xpos; Pos.z = Floor.ypos;
+                Pos.x = floorinfo.x_pos; Pos.z = floorinfo.y_pos;
                 newFloor.transform.position = Pos;
 
                 Vector3 Scale = newFloor.transform.localScale;
-                Scale.x = Floor.Width; Scale.z = Floor.Length;
+                Scale.x = floorinfo.Width; Scale.z = floorinfo.Length;
                 newFloor.transform.localScale = Scale;
             }
 
@@ -317,19 +330,22 @@ public class SaveLoad : MonoBehaviour {
             foreach (ceiling Ceiling in sceneDetails.Ceilings)
             {
                 GameObject newCeiling = Instantiate(Resources.Load<GameObject>("Prefabs/Ceiling"));
-                newCeiling.name = AllObjectsNames[Ceiling.NameIndex - 1];
+                Ceiling ceilinginfo = newCeiling.GetComponent<Ceiling>();
+                ceilinginfo.FillInfo(AllObjectsNames[Ceiling.NameIndex], Ceiling.xpos, Ceiling.ypos,
+                    Ceiling.zpos, Ceiling.Length, Ceiling.Width, Ceiling.Opacity);
+                newCeiling.name = ceilinginfo.Name;
                 newCeiling.transform.SetParent(Scene.transform);
 
                 Vector3 Pos = newCeiling.transform.position;
-                Pos.x = Ceiling.xpos; Pos.y = Ceiling.zpos; Pos.z = Ceiling.ypos;
+                Pos.x = ceilinginfo.x_pos; Pos.y = ceilinginfo.z_pos; Pos.z = ceilinginfo.y_pos;
                 newCeiling.transform.position = Pos;
 
                 Vector3 Scale = newCeiling.transform.localScale;
-                Scale.x = Ceiling.Width; Scale.z = Ceiling.Length;
+                Scale.x = ceilinginfo.Width; Scale.z = ceilinginfo.Length;
                 newCeiling.transform.localScale = Scale;
 
                 Vector4 color = newCeiling.GetComponent<Renderer>().material.color;
-                color[3] = Ceiling.Opacity;
+                color[3] = ceilinginfo.Opacity;
                 newCeiling.GetComponent<Renderer>().material.color = color;
             }
 
@@ -337,19 +353,22 @@ public class SaveLoad : MonoBehaviour {
             foreach (obstacle Obstacle in sceneDetails.Obstacles)
             {
                 GameObject newObstacle = Instantiate(Resources.Load<GameObject>("Prefabs/Obstacle"));
-                newObstacle.name = AllObjectsNames[Obstacle.NameIndex - 1];
+                Obstacle obstacleinfo = newObstacle.GetComponent<Obstacle>();
+                obstacleinfo.FillInfo(AllObjectsNames[Obstacle.NameIndex], Obstacle.xpos, Obstacle.ypos,
+                    Obstacle.Width, Obstacle.Length, Obstacle.Height, Obstacle.Opacity);
+                newObstacle.name = obstacleinfo.Name;
                 newObstacle.transform.SetParent(Scene.transform);
 
                 Vector3 Pos = newObstacle.transform.position;
-                Pos.x = Obstacle.xpos; Pos.z = Obstacle.ypos;
+                Pos.x = obstacleinfo.x_pos; Pos.z = obstacleinfo.y_pos;
                 newObstacle.transform.position = Pos;
 
                 Vector3 Scale = newObstacle.transform.localScale;
-                Scale.x = Obstacle.Width; Scale.y = Obstacle.Height;  Scale.z = Obstacle.Length;
+                Scale.x = obstacleinfo.Width; Scale.y = obstacleinfo.Height;  Scale.z = obstacleinfo.Length;
                 newObstacle.transform.localScale = Scale;
 
                 Vector4 color = newObstacle.GetComponent<Renderer>().material.color;
-                color[3] = Obstacle.Opacity;
+                color[3] = obstacleinfo.Opacity;
                 newObstacle.GetComponent<Renderer>().material.color = color;
             }
 
@@ -357,91 +376,95 @@ public class SaveLoad : MonoBehaviour {
             foreach (door Door in sceneDetails.Doors)
             {
                 GameObject newDoor = Instantiate(Resources.Load<GameObject>("Prefabs/Door"));
-                newDoor.name = AllObjectsNames[Door.NameIndex - 1];
+                Door doorinfo = newDoor.GetComponent<Door>();
 
-                newDoor.GetComponent<Door>().WallAttachedTo = Scene.transform.Find(AllObjectsNames[Door.WallNameIndex - 1]).gameObject;
-
-                Transform WallTransform = newDoor.GetComponent<Door>().WallAttachedTo.transform;
-
-                newDoor.transform.SetParent(WallTransform);
-
+                // Fill in the values of variables in Door.cs
+                doorinfo.Name = AllObjectsNames[Door.NameIndex];
+                doorinfo.WallAttachedTo = Scene.transform.Find(AllObjectsNames[Door.WallNameIndex]).gameObject;
                 foreach (GameObject sceneobj in AllSceneObjects)
                 {
-                    if (sceneobj.name == AllObjectsNames[Door.SceneNameIndex - 1])
+                    if (sceneobj.name == AllObjectsNames[Door.SceneNameIndex])
                     {
-                        newDoor.GetComponent<Door>().NextScene = sceneobj;
+                        doorinfo.NextScene = sceneobj;
                         break;
                     }
                 }
-
                 if (Door.Open == 1)
                 {
-                    newDoor.GetComponent<Door>().Open = true;
+                    doorinfo.Open = true;
                 }
                 else
                 {
-                    newDoor.GetComponent<Door>().Open = false;
+                    doorinfo.Open = false;
                 }
+                doorinfo.Width = Door.Width;
+                doorinfo.Height = Door.Height;
+                doorinfo.RelativePosition = Door.RelativePosition;
 
-                Vector3 Pos = newDoor.transform.localPosition;
-                Pos.x = Door.RelativePosition;
-                newDoor.transform.localPosition = Pos;
+                // Create the door gameobject accordingly
+                newDoor.name = doorinfo.Name;
 
-                newDoor.transform.localEulerAngles = new Vector3(0, 0, 0);
+                Transform WallTransform = doorinfo.WallAttachedTo.transform;
+                newDoor.transform.SetParent(WallTransform);
+                Vector3 WallPosition = WallTransform.position;
+                Vector3 WallDimensions = WallTransform.localScale;
 
-                Vector3 Scale = newDoor.transform.localScale;
-                Scale.x = Door.Width; Scale.y = Door.Height;
-                newDoor.transform.localScale = Scale;
+                newDoor.transform.localEulerAngles = new Vector3(0, 0, 0); // angle
+
+                float rel_x = doorinfo.RelativePosition / WallDimensions.x;
+                float rel_y = ((doorinfo.Height / 2) - WallPosition.y) / WallDimensions.y;
+                newDoor.transform.localPosition = new Vector3(rel_x, rel_y, 0); // pos
+
+                newDoor.transform.localScale = new Vector3(doorinfo.Width / WallDimensions.x,
+                     doorinfo.Height / WallDimensions.y, 1.033f); //scale
             }
 
             // 4.3.7 Create all the fires
             foreach (fire Fire in sceneDetails.Fires)
             {
                 GameObject newFire = Instantiate(Resources.Load<GameObject>("Prefabs/Fire"));
-                newFire.name = AllObjectsNames[Fire.NameIndex - 1];
+                Fire fireinfo = newFire.GetComponent<Fire>();
+
+                fireinfo.FillInfo(AllObjectsNames[Fire.NameIndex], Fire.xpos, Fire.ypos, Fire.zpos, Fire.Width,
+                    Fire.Length, Fire.HRRPUA, Fire.CO_YIELD, Fire.SOOT_YIELD, fireinfo.Fuels[Fire.Fuel]);
+                newFire.name = fireinfo.Name;
                 newFire.transform.SetParent(Scene.transform);
 
                 Vector3 Pos = newFire.transform.position;
-                Pos.x = Fire.xpos; Pos.y = Fire.zpos; Pos.z = Fire.ypos;
+                Pos.x = fireinfo.x_pos; Pos.y = fireinfo.z_pos; Pos.z = fireinfo.y_pos;
                 newFire.transform.position = Pos;
 
                 Vector3 Scale = newFire.transform.localScale;
-                Scale.x = Fire.Width; Scale.z = Fire.Length;
+                Scale.x = fireinfo.Width; Scale.z = fireinfo.Length;
                 newFire.transform.localScale = Scale;
-
-                newFire.GetComponent<Fire>().HRRPUA = Fire.HRRPUA;
-                newFire.GetComponent<Fire>().FUEL = newFire.GetComponent<Fire>().Fuels[Fire.Fuel];
-                newFire.GetComponent<Fire>().CO_YIELD = Fire.CO_YIELD;
-                newFire.GetComponent<Fire>().SOOT_YIELD = Fire.SOOT_YIELD;
             }
 
             // 4.3.8 Create all the pedestrians
             foreach (pedestrian Pedestrian in sceneDetails.Pedestrians)
             {
                 GameObject newPedestrian = Instantiate(Resources.Load<GameObject>("Prefabs/Pedestrian"));
-                newPedestrian.name = AllObjectsNames[Pedestrian.NameIndex - 1];
-                newPedestrian.transform.SetParent(Scene.transform);
-
-                Vector3 Pos = newPedestrian.transform.position;
-                Pos.x = Pedestrian.xpos; Pos.z = Pedestrian.ypos;
-                newPedestrian.transform.position = Pos;
-
-                newPedestrian.GetComponent<Pedestrian>().Speed = Pedestrian.Speed;
-                newPedestrian.GetComponent<Pedestrian>().Health = Pedestrian.Health;
+                Pedestrian pedestrianinfo = newPedestrian.GetComponent<Pedestrian>();
 
                 Transform ExitTransform = null;
                 foreach (Transform Object in Scene.transform)
                 {
                     if (Object.tag == "Wall")
                     {
-                        ExitTransform = Object.Find(AllObjectsNames[Pedestrian.ExitNameIndex - 1]);
+                        ExitTransform = Object.Find(AllObjectsNames[Pedestrian.ExitNameIndex]);
                         if (ExitTransform != null)
                         {
                             break;
                         }
                     }
                 }
-                newPedestrian.GetComponent<Pedestrian>().Exit = ExitTransform.gameObject;
+                pedestrianinfo.FillInfo(AllObjectsNames[Pedestrian.NameIndex], Pedestrian.xpos,
+                    Pedestrian.ypos, Pedestrian.Speed, Pedestrian.Health, ExitTransform.gameObject);
+                newPedestrian.name = pedestrianinfo.Name;
+                newPedestrian.transform.SetParent(Scene.transform);
+
+                Vector3 Pos = newPedestrian.transform.position;
+                Pos.x = pedestrianinfo.x_pos; Pos.z = pedestrianinfo.y_pos;
+                newPedestrian.transform.position = Pos;
             }
         }
     }
@@ -475,6 +498,14 @@ public class SaveLoad : MonoBehaviour {
                 // For each object in the scene, destory its associated button and then also destory itself.
                 foreach (Transform Object in Scene.transform)
                 {
+                    if (Object.tag == "Wall")
+                    {
+                        foreach (Transform door in Object.transform)
+                        {
+                            Destroy(door.gameObject.GetComponent<AssociatedButton>().button);
+                            Destroy(Object.gameObject);
+                        }
+                    }
                     // Destory the associated button
                     Destroy(Object.gameObject.GetComponent<AssociatedButton>().button);
 
@@ -622,17 +653,27 @@ public class SaveLoad : MonoBehaviour {
 
             // 3.4 Let only the first scene in AllScenes be active.
             // Disable all other scenes and all their related game objects and buttons
-            int i = 1;
-            do
+            if (AllScenes.Count != 1)
             {
-                foreach (Transform Object in AllScenes[i].transform)
+                int i = 1;
+                do
                 {
-                    Object.gameObject.GetComponent<AssociatedButton>().button.SetActive(false);
+                    foreach (Transform Object in AllScenes[i].transform)
+                    {
+                        if (Object.tag == "Wall")
+                        {
+                            foreach (Transform door in Object.transform)
+                            {
+                                door.gameObject.GetComponent<AssociatedButton>().button.SetActive(false);
+                            }
+                        }
+                        Object.gameObject.GetComponent<AssociatedButton>().button.SetActive(false);
+                    }
+                    AllScenes[i].SetActive(false);
+                    i++;
                 }
-                AllScenes[i].SetActive(false);
-                i++;
+                while (i < AllScenes.Count);
             }
-            while (i < AllScenes.Count);
 
             // 3.5 In DesignSceneGameManager, set TempObjectHolder = first scene, CurrentScene = first scene,
             // LastClickedButton = null; Update the Header

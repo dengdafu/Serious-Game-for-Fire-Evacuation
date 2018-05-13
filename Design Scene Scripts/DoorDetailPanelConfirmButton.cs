@@ -10,8 +10,16 @@ public class DoorDetailPanelConfirmButton : MonoBehaviour {
     public GameObject OpenPanel;
     public GameObject ClosePanel;
     public GameObject WarningWindow;
-    public Toggle OpenToggle;
     public Button CancelButton;
+
+    public InputField Name;
+    public InputField Wall;
+    public InputField Scene;
+    public InputField RelativePosition;
+    public Toggle OpenToggle;
+    public InputField Width;
+    public InputField Height;
+
 
     public void OnClick()
     {
@@ -19,49 +27,12 @@ public class DoorDetailPanelConfirmButton : MonoBehaviour {
         GameObject CurrentObject = gamemanager.GetComponent<DesignSceneGameManager>().GetTempObjectHolder();
         GameObject lastClickedButton = gamemanager.GetComponent<DesignSceneGameManager>().GetLastClickedButton();
 
-        InputField[] InputFields = DetailPanel.GetComponentsInChildren<InputField>();
-        string WallName = "qwertyyyytterwdfdfasdcxcvch"; //just some default name used as placeholder
-        string NextScene = "qwertyyyytterwdfdfasdcxcvch";
-        float RelativePosition = 0;
-        float Width = 1;
-        float Height = 1;
+        string WallName = Wall.text;
+        string NextScene = Scene.text;
+        float RelPos = float.Parse(RelativePosition.text);
+        float width = float.Parse(Width.text);
+        float height = float.Parse(Height.text);
         bool Open = OpenToggle.isOn;
-
-        foreach (InputField inputfield in InputFields)
-        {
-            if (inputfield.name == "Wall")
-            {
-                WallName = inputfield.text;
-            }
-            else if (inputfield.name == "Next Scene")
-            {
-                NextScene = inputfield.text;
-            }
-            else if (inputfield.name == "Relative Position")
-            {
-                try
-                {
-                    RelativePosition = float.Parse(inputfield.text);
-                }
-                catch { }
-            }
-            else if (inputfield.name == "Width")
-            {
-                try
-                {
-                    Width = float.Parse(inputfield.text);
-                }
-                catch { }
-            }
-            else if (inputfield.name == "Height")
-            {
-                try
-                {
-                    Height = float.Parse(inputfield.text);
-                }
-                catch { }
-            }
-        }
 
         // if there is no such wall or no such next scene, then the warning window will be popoed up.
         GameObject wall = GameObject.Find(WallName);
@@ -86,19 +57,17 @@ public class DoorDetailPanelConfirmButton : MonoBehaviour {
         else
         {
             // Set variables in Door.cs
-            CurrentObject.GetComponent<Door>().WallAttachedTo = wall;
-            CurrentObject.GetComponent<Door>().NextScene = scene;
-            CurrentObject.GetComponent<Door>().Open = Open;
+            CurrentObject.GetComponent<Door>().FillInfo(Name.text, wall, scene, Open, RelPos, width, height);
 
             // Set up the door object correctly
             CurrentObject.transform.SetParent(wall.transform);
             Vector3 WallPosition = wall.transform.position;
             Vector3 WallDimensions = wall.transform.localScale;
             CurrentObject.transform.localEulerAngles = new Vector3(0, 0, 0);
-            float rel_x = RelativePosition / WallDimensions.x;
-            float rel_y = ((Height / 2) - WallPosition.y) / WallDimensions.y;
+            float rel_x = RelPos / WallDimensions.x;
+            float rel_y = ((height / 2) - WallPosition.y) / WallDimensions.y;
             CurrentObject.transform.localPosition = new Vector3(rel_x,rel_y,0);
-            CurrentObject.transform.localScale = new Vector3(Width/WallDimensions.x,Height/WallDimensions.y,1.033f);
+            CurrentObject.transform.localScale = new Vector3(width/WallDimensions.x,height/WallDimensions.y,1.033f);
 
             // only if the object currently being designed is not an existing object, should a button be
             // added to the object list, otherwise, just use the pre-existed button with the updated name.

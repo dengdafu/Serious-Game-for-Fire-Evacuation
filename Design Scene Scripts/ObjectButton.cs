@@ -282,15 +282,6 @@ public class ObjectButton : MonoBehaviour {
                         inputfield.text = Health.ToString();
                     }
                 }
-                Dropdown Fuel = RelatedPanel.GetComponentInChildren<Dropdown>();
-                for (int i = 0; i < Fuel.options.Count; i++)
-                {
-                    if (Fuel.options[i].text == FUEL)
-                    {
-                        Fuel.value = i;
-                        break;
-                    }
-                }
             }
         }
     }
