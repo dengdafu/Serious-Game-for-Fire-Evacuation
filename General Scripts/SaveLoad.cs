@@ -22,6 +22,7 @@ public class SaveLoad : MonoBehaviour {
     public Button DoorObjectExampleButton;
     public Button FireObjectExampleButton;
     public Button PedestrianObjectExampleButton;
+    public Button PlayerObjectExampleButton;
 
     public GameObject SceneList;
     public GameObject SceneButtonInstance;
@@ -67,6 +68,7 @@ public class SaveLoad : MonoBehaviour {
             sceneDetails.Doors = new List<door>();
             sceneDetails.Fires = new List<fire>();
             sceneDetails.Pedestrians = new List<pedestrian>();
+            sceneDetails.Players = new List<player>();
             // 4.3.1 Fill in the simulation info
             sceneDetails.SimTime = Scene.GetComponent<SceneInfo>().SimulationTime;
             sceneDetails.TimeStep = Scene.GetComponent<SceneInfo>().TimeStep;
@@ -192,6 +194,18 @@ public class SaveLoad : MonoBehaviour {
                     AllObjectNames.Add(pedestrianinfo.Exit.name);
                     PedestrianInfo.ExitNameIndex = AllObjectNames.Count - 1;
                     sceneDetails.Pedestrians.Add(PedestrianInfo);
+                }
+                else if (ChildObjectTransform.tag == "Player")
+                {
+                    player PlayerInfo = new player();
+                    Player playerinfo = ChildObjectTransform.gameObject.GetComponent<Player>();
+                    AllObjectNames.Add(playerinfo.Name);
+                    PlayerInfo.NameIndex = AllObjectNames.Count - 1;
+                    PlayerInfo.xpos = playerinfo.x_pos;
+                    PlayerInfo.ypos = playerinfo.y_pos;
+                    PlayerInfo.Speed = playerinfo.Speed;
+                    PlayerInfo.Health = playerinfo.Health;
+                    sceneDetails.Players.Add(PlayerInfo);
                 }
             }
 
@@ -466,6 +480,24 @@ public class SaveLoad : MonoBehaviour {
                 Pos.x = pedestrianinfo.x_pos; Pos.z = pedestrianinfo.y_pos;
                 newPedestrian.transform.position = Pos;
             }
+
+            // 4.3.9 Create the player
+            if (sceneDetails.Players != null)
+            {
+                foreach (player Player in sceneDetails.Players)
+                {
+                    GameObject newPlayer = Instantiate(Resources.Load<GameObject>("Prefabs/DesignScenePlayer"));
+                    Player playerinfo = newPlayer.GetComponent<Player>();
+                    playerinfo.FillInfo(AllObjectsNames[Player.NameIndex], Player.xpos, Player.ypos,
+                        Player.Speed, Player.Health);
+                    newPlayer.name = playerinfo.Name;
+                    newPlayer.transform.SetParent(Scene.transform);
+
+                    Vector3 PlayerPos = newPlayer.transform.position;
+                    PlayerPos.x = playerinfo.x_pos; PlayerPos.z = playerinfo.y_pos;
+                    newPlayer.transform.position = PlayerPos;
+                }
+            }
         }
     }
 
@@ -631,6 +663,20 @@ public class SaveLoad : MonoBehaviour {
                         clone.GetComponentInChildren<Text>().text = Object.gameObject.name;
                         Object.gameObject.GetComponent<AssociatedButton>().button = clone.gameObject;
                     }
+                    // 3.2.7 Player buttons
+                    else if (Object.tag == "Player")
+                    {
+                        Button clone = Instantiate(PedestrianObjectExampleButton);
+                        clone.gameObject.SetActive(true);
+                        clone.transform.SetParent(ObjectList.transform);
+                        clone.GetComponent<RectTransform>().sizeDelta = PedestrianObjectExampleButton.GetComponent<RectTransform>().sizeDelta;
+                        clone.GetComponent<RectTransform>().localEulerAngles = PedestrianObjectExampleButton.GetComponent<RectTransform>().localEulerAngles;
+                        clone.GetComponent<RectTransform>().localPosition = PedestrianObjectExampleButton.GetComponent<RectTransform>().localPosition;
+                        clone.GetComponent<RectTransform>().localScale = PedestrianObjectExampleButton.GetComponent<RectTransform>().localScale;
+                        clone.GetComponent<ObjectButton>().SetLink(Object.gameObject);
+                        clone.GetComponentInChildren<Text>().text = Object.gameObject.name;
+                        Object.gameObject.GetComponent<AssociatedButton>().button = clone.gameObject;
+                    }
                 }
             }
 
@@ -716,6 +762,7 @@ public class SceneDetails
     public List<door> Doors;
     public List<fire> Fires;
     public List<pedestrian> Pedestrians;
+    public List<player> Players;
 }
 
 [Serializable]
@@ -798,6 +845,16 @@ public class pedestrian
     public float xpos;
     public float ypos;
     public int ExitNameIndex;
+    public float Speed;
+    public float Health;
+}
+
+[Serializable]
+public class player
+{
+    public int NameIndex;
+    public float xpos;
+    public float ypos;
     public float Speed;
     public float Health;
 }

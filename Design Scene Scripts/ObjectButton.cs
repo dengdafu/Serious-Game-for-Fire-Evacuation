@@ -39,6 +39,10 @@ public class ObjectButton : MonoBehaviour {
     private float Speed;
     private float Health;
 
+    // This part is used to store some extra original information of Player object;
+    private float PlayerSpeed;
+    private float PlayerHealth;
+
     public void SetOriginalInfo(string name = null, float xp = 0, float yp = 0, float zp = 0,
         float xr = 0, float yr = 0, float zr = 0, float l = 1, float w = 1, float h = 1, 
         float o = 1)
@@ -280,6 +284,33 @@ public class ObjectButton : MonoBehaviour {
                     else if (inputfield.name == "Health")
                     {
                         inputfield.text = Health.ToString();
+                    }
+                }
+            }
+            else if (LinkedGameObject.tag == "Player")
+            {
+                InputField[] AllInputFields = RelatedPanel.GetComponentsInChildren<InputField>();
+                foreach (InputField inputfield in AllInputFields)
+                {
+                    if (inputfield.name == "Name")
+                    {
+                        inputfield.text = OriginalName;
+                    }
+                    else if (inputfield.name == "x position")
+                    {
+                        inputfield.text = LinkedGameObject.transform.position.x.ToString();
+                    }
+                    else if (inputfield.name == "y position")
+                    {
+                        inputfield.text = LinkedGameObject.transform.position.z.ToString();
+                    }
+                    else if (inputfield.name == "Speed")
+                    {
+                        inputfield.text = PlayerSpeed.ToString();
+                    }
+                    else if (inputfield.name == "Health")
+                    {
+                        inputfield.text = PlayerHealth.ToString();
                     }
                 }
             }

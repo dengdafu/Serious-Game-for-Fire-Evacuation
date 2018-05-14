@@ -13,6 +13,8 @@ public class DesignSceneGameManager : MonoBehaviour {
     public GameObject SceneList; // For creating initial scene
     public GameObject SceneButtonInstance; // For creating initial scene
 
+    public GameObject Player = null; // For holding the player object
+
     // TempObjectHolder is used to temperarily hold a gameobject that is being initiated.
     GameObject TempObjectHolder = null;
     public GameObject GetTempObjectHolder()

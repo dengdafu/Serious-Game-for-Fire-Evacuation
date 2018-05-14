@@ -6,6 +6,12 @@ public class DetailPanelDestroyButton : MonoBehaviour {
     {
         GameObject gamemanager = GameObject.FindGameObjectWithTag("GameManager");
 
+        // If the object is "Player", set DesignSceneGameManage.Player back to null
+        if (gamemanager.GetComponent<DesignSceneGameManager>().GetTempObjectHolder().tag == "Player")
+        {
+            gamemanager.GetComponent<DesignSceneGameManager>().Player = null;
+        }
+
         // Destroy the currently designed object
         Destroy(gamemanager.GetComponent<DesignSceneGameManager>().GetTempObjectHolder());
 
