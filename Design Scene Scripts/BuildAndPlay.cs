@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
@@ -19,7 +20,6 @@ public class BuildAndPlay : MonoBehaviour {
         DirectoryInfo[] subdirs = dir.GetDirectories();
 
         // 3. Go into each subdirectory to do the simulation
-        int REAC_COUNT = 0;
         foreach (DirectoryInfo subdir in subdirs)
         {
             // 4. Create fds input file
@@ -163,15 +163,113 @@ public class BuildAndPlay : MonoBehaviour {
             writer.Close();
 
             // 5. Run the fds input file
+            Process myProcess = new Process();
+            myProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            myProcess.StartInfo.CreateNoWindow = true;
+            myProcess.StartInfo.UseShellExecute = false;
+            myProcess.StartInfo.FileName = "cmd.exe";
+            string cmdpath = WorkingDirectory.Replace("/", "\\");
+            string path = "/c" + "cd " + cmdpath + "& fds " + subdir.Name + ".fds";
+            myProcess.StartInfo.Arguments = path;
+            myProcess.EnableRaisingEvents = true;
+            myProcess.Start();
+            myProcess.WaitForExit();
 
             // 6. Extract useful data (smoke density) from fds output file, out it
             // into a matrix form and store it in a binary file
+            string head_name = subdir.Name;
+            string output_name;
+            string directory_location = WorkingDirectory.Replace("/", "\\");
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.CreateNoWindow = true;
+            startInfo.UseShellExecute = false;
+            startInfo.RedirectStandardInput = true;
+            startInfo.FileName = "cmd.exe";
+            startInfo.WorkingDirectory = directory_location;
+            //startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
-            // 7. bake agents (maybe this should be done in the play scene)
+            Process process = new Process();
+            process.StartInfo = startInfo;
 
-            REAC_COUNT += 1;
+            process.Start();
+
+            process.StandardInput.WriteLine("& md TimeDensity");
+
+            // Loop to output n t_n.txt files. For the moment, time step is set to be TimeStep
+            float time_index = 0; float timestep = sceneDetails.TimeStep; float simtime = sceneDetails.SimTime;
+            while (time_index * timestep < simtime)
+            {
+                process.StandardInput.WriteLine("fds2ascii");
+                process.StandardInput.WriteLine(head_name);
+                process.StandardInput.WriteLine("2");
+                process.StandardInput.WriteLine("1");
+                process.StandardInput.WriteLine("n");
+                if ((time_index + 1) * timestep <= simtime)
+                {
+                    process.StandardInput.WriteLine(timestep * time_index + " " + timestep * (time_index + 1));
+                }
+                else
+                {
+                    process.StandardInput.WriteLine(timestep * time_index + " " + simtime);
+                }
+                process.StandardInput.WriteLine(num_of_slices);
+
+                for (int i = 1; i <= num_of_slices; i += 1)
+                {
+                    process.StandardInput.WriteLine(i);
+                }
+                output_name = "t" + time_index;
+                process.StandardInput.WriteLine(output_name);
+                process.StandardInput.WriteLine("MOVE " + output_name + " " + "TimeDensity");
+                time_index += 1;
+            }
+            process.StandardInput.WriteLine("exit");
+            process.WaitForExit();
+
+            // Summarize the result by putting it into a list, AllData (A).
+            // A[a] = density(t,x,y,z) where:
+            // let d be the grid length, T simulation time, ts time step
+            // i be the number of points on x axis: i = x/d + 1 (eg. 0, 0.5, 1)
+            // j be the number of points on y axis: j = y/d + 1
+            // k be the number of points on z axis: k = z/d (eg 0.5, 1; no 0)
+            // l be the number of time points: SimTime/TimeStep (0.5, 1.5, ... 29.5, SimTime = 30, TimeStep = 1)
+            // =>
+            // *** t = quotient(a, i*j*k) + 0.5ts
+            // o = remainder(a, i*j*k)
+            // *** x = x0 + quotient(o, j*k)*d ***
+            // p = remainder(o, j*k)
+            // *** y = y0 + quotient(p, k)*d ***
+            // *** z = z0 + remainder(p, k)*d ***
+            List<float> AllData = new List<float>();
+            string[] DataAtT;
+            string Data;
+            StreamReader reader;
+            if (Directory.Exists(WorkingDirectory + "/TimeDensity"))
+            {
+                for (int n = 0; n < simtime / timestep; n ++)
+                {
+                    reader = new StreamReader(WorkingDirectory +  "/TimeDensity/t" + n);
+                    // Skip the first two lines
+                    reader.ReadLine();
+                    reader.ReadLine();
+                    Data = reader.ReadToEnd();
+                    reader.Close();
+
+                    DataAtT = Data.Split(',', '\n');
+
+                    foreach (string str in DataAtT)
+                    {
+                        if (str != "")
+                        {
+                            AllData.Add(float.Parse(str));
+                        }
+                    }
+                }
+            }
+            BinaryFormatter BF = new BinaryFormatter();
+            FileStream alldatafile = File.Open(WorkingDirectory + "/TimeDensity/AllData.dat", FileMode.OpenOrCreate);
+            BF.Serialize(alldatafile, AllData);
+            alldatafile.Close();
         }
-
-
     }
 }
