@@ -317,18 +317,6 @@ public class ObjectButton : MonoBehaviour {
         }
     }
 
-    public void Debuger()
-    {
-        if (LinkedGameObject == null)
-        {
-            Debug.Log("NoLinkedGameObject");
-        }
-        else
-        {
-            Debug.Log("YesLinkedGameObject");
-        }
-    }
-
     public void ResetInfo()
     {
         if (LinkedGameObject != null)

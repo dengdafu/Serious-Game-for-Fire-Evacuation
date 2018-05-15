@@ -7,7 +7,7 @@ public class ToolBoxPedestrianButton : MonoBehaviour {
         GameObject gamemanager = GameObject.FindGameObjectWithTag("GameManager");
 
         // Initiate the pedestrian object and put it under the current scene
-        GameObject Object = Instantiate(Resources.Load<GameObject>("Prefabs/Pedestrian"));
+        GameObject Object = Instantiate(Resources.Load<GameObject>("Prefabs/DesignScenePedestrian"));
         Object.transform.SetParent(gamemanager.GetComponent<DesignSceneGameManager>().GetCurrentScene().transform);
 
         // Set "TempObjectHolder" in DesignSceneGameManager to be this initiated pedestrian

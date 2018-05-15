@@ -2,6 +2,7 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class DesignSceneGameManager : MonoBehaviour {
 
@@ -126,5 +127,10 @@ public class DesignSceneGameManager : MonoBehaviour {
         {
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraControl>().enabled = true;
         }
+    }
+
+    public void DesignSceneChangeScene(string scene_name)
+    {
+        SceneManager.LoadScene(scene_name);
     }
 }

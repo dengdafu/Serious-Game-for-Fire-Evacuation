@@ -232,7 +232,7 @@ public class SaveLoad : MonoBehaviour {
         // 1. Set WorkingDirectory
         WorkingDirectory = Application.persistentDataPath + "/" + ScenarioName.text;
 
-        // 2. Get a string[] contains all the subdirectories in the scenario (all the scenes)
+        // 2. Get a List<string> contains all the subdirectories in the scenario (all the scenes)
         DirectoryInfo dir = new DirectoryInfo(WorkingDirectory);
         DirectoryInfo[] subdirs = dir.GetDirectories();
         List<string> AllScenes = new List<string>();
@@ -456,7 +456,7 @@ public class SaveLoad : MonoBehaviour {
             // 4.3.8 Create all the pedestrians
             foreach (pedestrian Pedestrian in sceneDetails.Pedestrians)
             {
-                GameObject newPedestrian = Instantiate(Resources.Load<GameObject>("Prefabs/Pedestrian"));
+                GameObject newPedestrian = Instantiate(Resources.Load<GameObject>("Prefabs/DesignScenePedestrian"));
                 Pedestrian pedestrianinfo = newPedestrian.GetComponent<Pedestrian>();
 
                 Transform ExitTransform = null;
