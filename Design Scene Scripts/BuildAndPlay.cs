@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -60,23 +59,19 @@ public class BuildAndPlay : MonoBehaviour {
                 // 4.3.1 Write the header
                 string HEAD_LINE = "&HEAD CHID='" + subdir.Name + "', TITLE='" + subdir.Name + "'/";
                 writer.WriteLine(HEAD_LINE);
-                // 4.3.2 Setup the dimensions. For the moment, for simplicity, 
-                // let's just assume there is only one 'Floor' element, and all
-                // walls have same height
+                // 4.3.2 Setup the dimensions.
                 float FDS_x0; float FDS_x1; float FDS_y0; float FDS_y1; float FDS_z0; float FDS_z1;
-                floor mainfloor = sceneDetails.Floors[0];
-                wall typicalwall = sceneDetails.Walls[0];
-                FDS_x0 = mainfloor.xpos - (mainfloor.Width / 2);
-                FDS_x1 = mainfloor.xpos + (mainfloor.Width / 2);
-                FDS_y0 = mainfloor.ypos - (mainfloor.Length / 2);
-                FDS_y1 = mainfloor.ypos + (mainfloor.Length / 2);
+                FDS_x0 = - sceneDetails.Width / 2;
+                FDS_x1 = sceneDetails.Width / 2;
+                FDS_y0 = - sceneDetails.Length / 2;
+                FDS_y1 = sceneDetails.Width / 2; ;
                 FDS_z0 = 0;
-                FDS_z1 = typicalwall.Height;
+                FDS_z1 = sceneDetails.Height;
                 string XB = "XB=" + FDS_x0 + "," + FDS_x1 + "," + FDS_y0 + "," + FDS_y1 +
                             "," + FDS_z0 + "," + FDS_z1;
-                float MESH_I = ((FDS_x1 - FDS_x0) / sceneDetails.GridSize);
-                float MESH_J = ((FDS_y1 - FDS_y0) / sceneDetails.GridSize);
-                float MESH_K = ((FDS_z1 - FDS_z0) / sceneDetails.GridSize);
+                float MESH_I = FDS_x1 - FDS_x0 ; // Grid size set to 1
+                float MESH_J = FDS_y1 - FDS_y0;
+                float MESH_K = FDS_z1 - FDS_z0;
                 string MESH = "&MESH " + "IJK=" + MESH_I + "," + MESH_J + "," + MESH_K + ", " +
                               XB + "/";
                 writer.WriteLine(MESH);
@@ -151,9 +146,9 @@ public class BuildAndPlay : MonoBehaviour {
                 string SLCF_line;
                 int num_of_slices = 0;
 
-                for (float slice_z = FDS_z0 + sceneDetails.GridSize;
-                    slice_z < FDS_z1 + 0.5 * sceneDetails.GridSize;
-                    slice_z += sceneDetails.GridSize)
+                for (float slice_z = FDS_z0 + 1;
+                    slice_z < FDS_z1 + 0.5 * 1;
+                    slice_z += 1)
                 {
                     SLCF_line = "&SLCF PBZ=" + slice_z + ", " + "QUANTITY='DENSITY', SPEC_ID='SOOT'/";
                     writer.WriteLine(SLCF_line);
@@ -198,7 +193,7 @@ public class BuildAndPlay : MonoBehaviour {
                 process.StandardInput.WriteLine("& md TimeDensity");
 
                 // Loop to output n t_n.txt files. For the moment, time step is set to be TimeStep
-                float time_index = 0; float timestep = sceneDetails.TimeStep; float simtime = sceneDetails.SimTime;
+                float time_index = 0; float timestep = 1; float simtime = sceneDetails.SimTime;
                 while (time_index * timestep < simtime)
                 {
                     process.StandardInput.WriteLine("fds2ascii");
@@ -238,9 +233,9 @@ public class BuildAndPlay : MonoBehaviour {
                 // =>
                 // *** t = quotient(a, i*j*k) + 0.5ts
                 // o = remainder(a, i*j*k)
-                // *** x = x0 + quotient(o, j*k)*d ***
-                // p = remainder(o, j*k)
-                // *** y = y0 + quotient(p, k)*d ***
+                // *** y = y0 + quotient(o, i*k)*d ***
+                // p = remainder(o, i*k)
+                // *** x = x0 + quotient(p, k)*d ***
                 // *** z = z0 + remainder(p, k)*d ***
                 List<float> AllData = new List<float>();
                 string[] DataAtT;
@@ -254,18 +249,21 @@ public class BuildAndPlay : MonoBehaviour {
                         // Skip the first two lines
                         reader.ReadLine();
                         reader.ReadLine();
-                        Data = reader.ReadToEnd();
-                        reader.Close();
-
-                        DataAtT = Data.Split(',', '\n');
-
-                        foreach (string str in DataAtT)
+                        do
                         {
-                            if (str != "")
+                            Data = reader.ReadLine();
+                            DataAtT = Data.Split(',', '\n');
+
+                            for (int i = 2; i < DataAtT.Length; i++)
                             {
-                                AllData.Add(float.Parse(str));
+                                if (DataAtT[i] != "")
+                                {
+                                    AllData.Add(float.Parse(DataAtT[i]));
+                                }
                             }
                         }
+                        while (!reader.EndOfStream);
+                        reader.Close();
                     }
                 }
                 BinaryFormatter BF = new BinaryFormatter();

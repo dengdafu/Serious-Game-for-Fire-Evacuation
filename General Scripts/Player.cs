@@ -12,5 +12,4 @@ public class Player : MonoBehaviour {
     {
         Name = name; x_pos = xpos; y_pos = ypos; Speed = speed; Health = health;
     }
-
 }

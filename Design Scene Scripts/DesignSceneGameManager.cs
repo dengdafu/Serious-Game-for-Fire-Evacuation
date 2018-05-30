@@ -94,8 +94,6 @@ public class DesignSceneGameManager : MonoBehaviour {
         InitialScene.AddComponent<AssociatedButton>();
         InitialScene.AddComponent<SceneInfo>();
         InitialScene.GetComponent<SceneInfo>().SimulationTime = 0;
-        InitialScene.GetComponent<SceneInfo>().TimeStep = 0;
-        InitialScene.GetComponent<SceneInfo>().GridSize = 0;
         InitialScene.tag = "Scene";
         AllScenes.Add(InitialScene);
 

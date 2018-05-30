@@ -4,66 +4,28 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityStandardAssets.Characters.ThirdPerson;
+using UnityEngine.UI;
 
 public class InPlaySceneGameManager : MonoBehaviour {
 
+    public GameObject SmokeParticles;
+
+    public Text time;
+    private int currenttime = 0;
+
     public bool ScenarioLoaded = false;
 
-    /*private void Start()
-    {
-        // Add Scene
-        GameObject scene = new GameObject("Scene");
-        scene.tag = "Scene";
-        scene.transform.position = new Vector3(0, 0, 0);
-
-        GameObject newFloor = Instantiate(Resources.Load<GameObject>("Prefabs/InPlayFloor"));
-        newFloor.name = "Test floor";
-        newFloor.transform.SetParent(scene.transform);
-
-        Vector3 Scale = newFloor.GetComponent<Terrain>().terrainData.size;
-        Scale.x = 10; Scale.z = 10;
-        newFloor.GetComponent<Terrain>().terrainData.size = Scale;
-
-        Vector3 Pos = newFloor.transform.position;
-        Pos.x = 0 - (Scale.x / 2); Pos.z = 0 - (Scale.z / 2);
-        newFloor.transform.position = Pos;
-
-        // Bake the floor
-        newFloor.GetComponent<NavMeshLink>().startPoint = new Vector3(0, 0, 0);
-        newFloor.GetComponent<NavMeshLink>().endPoint = new Vector3(10, 0, 10);
-        newFloor.GetComponent<NavMeshSurface>().BuildNavMesh();
-
-        // Obstacle
-        GameObject newObstacle = Instantiate(Resources.Load<GameObject>("Prefabs/Obstacle"));
-        newObstacle.name = "Obstacle";
-        newObstacle.transform.SetParent(scene.transform);
-
-        Vector3 ObPos = newObstacle.transform.position;
-        ObPos.x = 5; ObPos.z = 5;
-        newObstacle.transform.position = ObPos;
-
-        Vector3 ObScale = newObstacle.transform.localScale;
-        Scale.x = 1; Scale.y = 1; Scale.z = 1;
-        newObstacle.transform.localScale = Scale;
-
-        // Agent
-        GameObject newPedestrian = Instantiate(Resources.Load<GameObject>("Prefabs/Pedestrian"));
-
-        newPedestrian.name = "Susan";
-        newPedestrian.transform.SetParent(scene.transform);
-
-        Vector3 PedPos = newPedestrian.transform.position;
-        PedPos.x = -5; PedPos.z = -5;
-        newPedestrian.transform.position = Pos;
-
-        newPedestrian.GetComponent<AICharacterControl>().target = newObstacle.transform;
-    }*/
+    public Text InterfaceDensity;
 
     private void Start()
     {
         // 1. Set WorkingDirectory
         string ScenarioName = ScenarioAtHand.ScenarioName;
         string WorkingDirectory = Application.persistentDataPath + "/" + ScenarioName;
+
+        float WIDTH = 0;
+        float LENGTH = 0;
+        float HEIGHT = 0;
 
         // 2. Load in all scenes in the scenario
         DirectoryInfo dir = new DirectoryInfo(WorkingDirectory);
@@ -122,10 +84,35 @@ public class InPlaySceneGameManager : MonoBehaviour {
             }
 
             // 4.3 Recover the scene based on sceneDetails
-            // 4.3.1 Fill in sim info. If it is in design scene, then need AddComponent<AssociatedButton>() as well.
+            // 4.3.1 Fill in sim info. If it is in design scene
             Scene.GetComponent<SceneInfo>().SimulationTime = sceneDetails.SimTime;
-            Scene.GetComponent<SceneInfo>().TimeStep = sceneDetails.TimeStep;
-            Scene.GetComponent<SceneInfo>().GridSize = sceneDetails.GridSize;
+            Scene.GetComponent<SceneInfo>().Width = sceneDetails.Width;
+            Scene.GetComponent<SceneInfo>().Length = sceneDetails.Length;
+            Scene.GetComponent<SceneInfo>().Height = sceneDetails.Height;
+            Scene.GetComponent<SceneInfo>().PlayerX = sceneDetails.PlayerX;
+            Scene.GetComponent<SceneInfo>().PlayerY = sceneDetails.PlayerY;
+            // 4.3.2 Fill in the TimeDensity in SceneInfo
+            //       and then effectivetimedensity
+            if (Directory.Exists(WorkingDirectory + "/TimeDensity/"))
+            {
+                BinaryFormatter TimeDensitybf = new BinaryFormatter();
+                FileStream TimeDensityfile = File.Open(WorkingDirectory + "/TimeDensity/" + "AllData.dat", FileMode.Open);
+                List<float> newTimeDensity = (List<float>)TimeDensitybf.Deserialize(TimeDensityfile);
+                TimeDensityfile.Close();
+                Scene.GetComponent<SceneInfo>().TimeDensity = newTimeDensity;
+                // Fill in EffectiveTimeDensity for model1, density at height 1.8m
+                List<float> newEfftiveTimeDensity = new List<float>();
+                int Width = Mathf.RoundToInt(sceneDetails.Width);
+                int Length = Mathf.RoundToInt(sceneDetails.Length);
+                int Height = Mathf.RoundToInt(sceneDetails.Height);
+                int Time = Mathf.RoundToInt(sceneDetails.SimTime);
+                for (int i = 0; i < (Width + 1) * (Length + 1) * Time; i++)
+                {
+                    newEfftiveTimeDensity.Add(newTimeDensity[1 + i * Height]);
+                }
+
+                Scene.GetComponent<SceneInfo>().EffectiveTimeDensity = newEfftiveTimeDensity;
+            }
 
             // 4.3.2 Create all the walls
             foreach (wall Wall in sceneDetails.Walls)
@@ -138,8 +125,10 @@ public class InPlaySceneGameManager : MonoBehaviour {
                 newWall.transform.SetParent(Scene.transform);
 
                 Vector3 Pos = newWall.transform.position;
-                Pos.x = wallinfo.x_pos; Pos.y = wallinfo.Height / 2; Pos.z = wallinfo.y_pos;
+                Pos.x = wallinfo.x_pos; Pos.y = wallinfo.Height / 2 + 0.01f; Pos.z = wallinfo.y_pos;
                 newWall.transform.position = Pos;
+
+                HEIGHT = wallinfo.Height;
 
                 Vector3 Angles = newWall.transform.eulerAngles;
                 Angles.y = wallinfo.z_rot;
@@ -167,6 +156,7 @@ public class InPlaySceneGameManager : MonoBehaviour {
                 Vector3 Scale = newFloor.GetComponent<Terrain>().terrainData.size;
                 Scale.x = floorinfo.Width; Scale.z = floorinfo.Length;
                 newFloor.GetComponent<Terrain>().terrainData.size = Scale;
+                WIDTH = floorinfo.Width; LENGTH = floorinfo.Length;
 
                 Vector3 Pos = newFloor.transform.position;
                 Pos.x = floorinfo.x_pos - (Scale.x / 2); Pos.z = floorinfo.y_pos - (Scale.z / 2);
@@ -177,6 +167,14 @@ public class InPlaySceneGameManager : MonoBehaviour {
                 newFloor.GetComponent<NavMeshLink>().endPoint = new Vector3(Scale.x, 0, Scale.z);
                 newFloor.GetComponent<NavMeshSurface>().BuildNavMesh();
             }
+
+            // ADD a light bulb to the scene
+            GameObject lightbulb = new GameObject("Scene light");
+            lightbulb.AddComponent<Light>();
+            lightbulb.GetComponent<Light>().type = LightType.Point;
+            lightbulb.transform.SetParent(Scene.transform);
+            Vector3 ScenePos = Scene.transform.localPosition;
+            lightbulb.transform.localPosition = new Vector3(ScenePos.x, HEIGHT - 0.1f, ScenePos.z);
 
             // 4.3.4 Create all the ceilings
             foreach (ceiling Ceiling in sceneDetails.Ceilings)
@@ -270,7 +268,7 @@ public class InPlaySceneGameManager : MonoBehaviour {
             // 4.3.7 Create all the fires
             foreach (fire Fire in sceneDetails.Fires)
             {
-                GameObject newFire = Instantiate(Resources.Load<GameObject>("Prefabs/Fire"));
+                GameObject newFire = Instantiate(Resources.Load<GameObject>("Prefabs/InPlayFire"));
                 Fire fireinfo = newFire.GetComponent<Fire>();
 
                 fireinfo.FillInfo(AllObjectsNames[Fire.NameIndex], Fire.xpos, Fire.ypos, Fire.zpos, Fire.Width,
@@ -281,10 +279,10 @@ public class InPlaySceneGameManager : MonoBehaviour {
                 Vector3 Pos = newFire.transform.position;
                 Pos.x = fireinfo.x_pos; Pos.y = fireinfo.z_pos; Pos.z = fireinfo.y_pos;
                 newFire.transform.position = Pos;
-
+              
                 Vector3 Scale = newFire.transform.localScale;
                 Scale.x = fireinfo.Width; Scale.z = fireinfo.Length;
-                newFire.transform.localScale = Scale;
+                newFire.transform.localScale = Scale;               
             }
 
             // 4.3.8 Create all the pedestrians
@@ -316,27 +314,95 @@ public class InPlaySceneGameManager : MonoBehaviour {
 
                 newPedestrian.GetComponent<AICharacterControl>().target = ExitTransform;
 
-
+                // For now, set agent's speed to be 0.45 ~ 1.5m/s
+                newPedestrian.GetComponent<NavMeshAgent>().speed = 0.45f;
             }
-            /*
-            // 4.3.9 Create the player in InPlayScene
-            if (sceneDetails.Players != null)
+            
+            // 4.3.9 Create the player in InPlayScene, the speed is set to be 2 in
+            // the inspector for now
+            foreach (player Player in sceneDetails.Players)
             {
-                foreach (player Player in sceneDetails.Players)
-                {
-                    GameObject newPlayer = Instantiate(Resources.Load<GameObject>("Prefabs/Player"));
-                    Player playerinfo = newPlayer.GetComponent<Player>();
-                    playerinfo.FillInfo(AllObjectsNames[Player.NameIndex], Player.xpos, Player.ypos,
-                        Player.Speed, Player.Health);
-                    newPlayer.name = playerinfo.Name;
-                    newPlayer.transform.SetParent(Scene.transform);
+                GameObject newPlayer = Instantiate(Resources.Load<GameObject>("Prefabs/Player"));
+                Player playerinfo = newPlayer.GetComponent<Player>();
+                playerinfo.FillInfo(AllObjectsNames[Player.NameIndex], Player.xpos, Player.ypos,
+                    Player.Speed, Player.Health);
+                newPlayer.name = playerinfo.Name;
+                newPlayer.transform.SetParent(Scene.transform);
 
-                    Vector3 PlayerPos = newPlayer.transform.position;
-                    PlayerPos.x = playerinfo.x_pos; PlayerPos.z = playerinfo.y_pos;
-                    newPlayer.transform.position = PlayerPos;
+                Vector3 PlayerPos = newPlayer.transform.position;
+                PlayerPos.x = sceneDetails.PlayerX; PlayerPos.z = sceneDetails.PlayerY;
+                newPlayer.transform.position = PlayerPos;
+
+                // Put the main camera on it
+                GameObject maincamera = GameObject.FindGameObjectWithTag("MainCamera");
+                maincamera.transform.SetParent(newPlayer.transform);
+                maincamera.transform.localPosition = new Vector3(0, 0, 0);
+            }
+
+            // 5. Only activate the scene where the player is in
+            if (sceneDetails.Players == null || sceneDetails.Players.Count == 0)
+            {
+                Scene.SetActive(false);
+            }
+
+            // temporary solution
+            if (Scene.name == "Outside")
+            {
+                Scene.SetActive(false);
+            }
+
+            // 6. Create all the smoke particles (particle system)
+            List<float> timedensity = Scene.GetComponent<SceneInfo>().TimeDensity;
+            if (timedensity != null)
+            {
+                float d = 1;
+                float t = 1;
+                float T = sceneDetails.SimTime;
+                float maxdensity = Mathf.Max(timedensity.ToArray());
+                int xnumber = (int)((WIDTH / d) + 1);
+                int ynumber = (int)((LENGTH / d) + 1);
+                int znumber = (int)((HEIGHT / d));
+                int tnumber = (int)(T / t);
+                for (int x = 0; x < xnumber; x++)
+                {
+                    for (int y = 0; y < ynumber; y++)
+                    {
+                        for (int z = 0; z < znumber; z++)
+                        {
+                            List<float> smokedensity = new List<float>();
+                            for (int n = 0; n < tnumber; n++)
+                            {
+                                int index;
+                                index = n * (xnumber * ynumber * znumber) +
+                                        y * (xnumber * znumber) +
+                                        x * znumber + z;
+                                smokedensity.Add(timedensity[index]);
+                            }
+                            if (Mathf.Max(smokedensity.ToArray()) > (maxdensity / 10))
+                            {
+                                GameObject newSmoke = Instantiate(Resources.Load<GameObject>("Prefabs/Smoke"));
+                                newSmoke.GetComponent<InPlaySmoke>().MaxDensity = maxdensity;
+                                newSmoke.GetComponent<InPlaySmoke>().Density = smokedensity;
+                                newSmoke.transform.SetParent(Scene.transform);
+                                newSmoke.transform.localPosition =
+                                    new Vector3(-(WIDTH / 2) + x * d, 0.5f * d + z * d, -(LENGTH / 2) + y * d);
+                            }
+                        }
+                    }
                 }
             }
-            */
+
+            // 7. Set currenttime to be 0
+            currenttime = 0;
+        }
+    }
+
+    private void Update()
+    {
+        if (Time.timeSinceLevelLoad >= currenttime)
+        {
+            time.text = currenttime.ToString();
+            currenttime += 1;
         }
     }
 }

@@ -33,13 +33,25 @@ public class SceneButton : MonoBehaviour {
                 {
                     inputfield.text = LinkedGameObject.GetComponent<SceneInfo>().SimulationTime.ToString();
                 }
-                else if (inputfield.name == "Time step")
+                else if (inputfield.name == "Width")
                 {
-                    inputfield.text = LinkedGameObject.GetComponent<SceneInfo>().TimeStep.ToString();
+                    inputfield.text = LinkedGameObject.GetComponent<SceneInfo>().Width.ToString();
                 }
-                else if (inputfield.name == "Grid size")
+                else if (inputfield.name == "Length")
                 {
-                    inputfield.text = LinkedGameObject.GetComponent<SceneInfo>().GridSize.ToString();
+                    inputfield.text = LinkedGameObject.GetComponent<SceneInfo>().Length.ToString();
+                }
+                else if (inputfield.name == "Height")
+                {
+                    inputfield.text = LinkedGameObject.GetComponent<SceneInfo>().Height.ToString();
+                }
+                else if (inputfield.name == "PlayerX")
+                {
+                    inputfield.text = LinkedGameObject.GetComponent<SceneInfo>().PlayerX.ToString();
+                }
+                else if (inputfield.name == "PlayerY")
+                {
+                    inputfield.text = LinkedGameObject.GetComponent<SceneInfo>().PlayerY.ToString();
                 }
             }
         }

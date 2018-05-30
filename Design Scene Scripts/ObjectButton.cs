@@ -86,7 +86,10 @@ public class ObjectButton : MonoBehaviour {
             width = LinkedGameObject.transform.localScale.x;
             length = LinkedGameObject.transform.localScale.z;
             height = LinkedGameObject.transform.localScale.y;
-            opacity = LinkedGameObject.GetComponent<Renderer>().material.color.a;
+            if (LinkedGameObject.tag != "Pedestrian")
+            {
+                opacity = LinkedGameObject.GetComponent<Renderer>().material.color.a;
+            }
 
             // Store some variables for door object
             if (LinkedGameObject.tag == "Door")

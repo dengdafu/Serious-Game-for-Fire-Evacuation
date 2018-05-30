@@ -71,8 +71,11 @@ public class SaveLoad : MonoBehaviour {
             sceneDetails.Players = new List<player>();
             // 4.3.1 Fill in the simulation info
             sceneDetails.SimTime = Scene.GetComponent<SceneInfo>().SimulationTime;
-            sceneDetails.TimeStep = Scene.GetComponent<SceneInfo>().TimeStep;
-            sceneDetails.GridSize = Scene.GetComponent<SceneInfo>().GridSize;
+            sceneDetails.Width = Scene.GetComponent<SceneInfo>().Width;
+            sceneDetails.Length = Scene.GetComponent<SceneInfo>().Length;
+            sceneDetails.Height = Scene.GetComponent<SceneInfo>().Height;
+            sceneDetails.PlayerX = Scene.GetComponent<SceneInfo>().PlayerX;
+            sceneDetails.PlayerY = Scene.GetComponent<SceneInfo>().PlayerY;
             // 4.3.2 fill in the info of different objects into sceneDetails
             foreach (Transform ChildObjectTransform in Scene.transform)
             {
@@ -291,8 +294,11 @@ public class SaveLoad : MonoBehaviour {
             // 4.3 Recover the scene based on sceneDetails
             // 4.3.1 Fill in sim info. If it is in design scene, then need AddComponent<AssociatedButton>() as well.
             Scene.GetComponent<SceneInfo>().SimulationTime = sceneDetails.SimTime;
-            Scene.GetComponent<SceneInfo>().TimeStep = sceneDetails.TimeStep;
-            Scene.GetComponent<SceneInfo>().GridSize = sceneDetails.GridSize;
+            Scene.GetComponent<SceneInfo>().Width = sceneDetails.Width;
+            Scene.GetComponent<SceneInfo>().Length = sceneDetails.Length;
+            Scene.GetComponent<SceneInfo>().Height = sceneDetails.Height;
+            Scene.GetComponent<SceneInfo>().PlayerX = sceneDetails.PlayerX;
+            Scene.GetComponent<SceneInfo>().PlayerY = sceneDetails.PlayerY;
 
             // 4.3.2 Create all the walls
             foreach (wall Wall in sceneDetails.Walls)
@@ -666,13 +672,13 @@ public class SaveLoad : MonoBehaviour {
                     // 3.2.7 Player buttons
                     else if (Object.tag == "Player")
                     {
-                        Button clone = Instantiate(PedestrianObjectExampleButton);
+                        Button clone = Instantiate(PlayerObjectExampleButton);
                         clone.gameObject.SetActive(true);
                         clone.transform.SetParent(ObjectList.transform);
-                        clone.GetComponent<RectTransform>().sizeDelta = PedestrianObjectExampleButton.GetComponent<RectTransform>().sizeDelta;
-                        clone.GetComponent<RectTransform>().localEulerAngles = PedestrianObjectExampleButton.GetComponent<RectTransform>().localEulerAngles;
-                        clone.GetComponent<RectTransform>().localPosition = PedestrianObjectExampleButton.GetComponent<RectTransform>().localPosition;
-                        clone.GetComponent<RectTransform>().localScale = PedestrianObjectExampleButton.GetComponent<RectTransform>().localScale;
+                        clone.GetComponent<RectTransform>().sizeDelta = PlayerObjectExampleButton.GetComponent<RectTransform>().sizeDelta;
+                        clone.GetComponent<RectTransform>().localEulerAngles = PlayerObjectExampleButton.GetComponent<RectTransform>().localEulerAngles;
+                        clone.GetComponent<RectTransform>().localPosition = PlayerObjectExampleButton.GetComponent<RectTransform>().localPosition;
+                        clone.GetComponent<RectTransform>().localScale = PlayerObjectExampleButton.GetComponent<RectTransform>().localScale;
                         clone.GetComponent<ObjectButton>().SetLink(Object.gameObject);
                         clone.GetComponentInChildren<Text>().text = Object.gameObject.name;
                         Object.gameObject.GetComponent<AssociatedButton>().button = clone.gameObject;
@@ -753,8 +759,11 @@ public class SaveLoad : MonoBehaviour {
 public class SceneDetails
 {
     public float SimTime;
-    public float TimeStep;
-    public float GridSize;
+    public float Width;
+    public float Length;
+    public float Height;
+    public float PlayerX;
+    public float PlayerY;
     public List<wall> Walls;
     public List<floor> Floors;
     public List<ceiling> Ceilings;

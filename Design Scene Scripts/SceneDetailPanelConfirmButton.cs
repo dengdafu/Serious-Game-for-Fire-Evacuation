@@ -7,8 +7,12 @@ public class SceneDetailPanelConfirmButton : MonoBehaviour {
     public GameObject SceneButtonInstance;
 
     public InputField SimulationTime;
-    public InputField TimeStep;
-    public InputField GridSize;
+    public InputField Width;
+    public InputField Length;
+    public InputField Height;
+
+    public InputField PlayerX;
+    public InputField PlayerY;
 
     public void Onclick()
     {
@@ -17,8 +21,12 @@ public class SceneDetailPanelConfirmButton : MonoBehaviour {
 
         // Write in the simulation info of the scene
         CurrentObject.GetComponent<SceneInfo>().SimulationTime = float.Parse(SimulationTime.text);
-        CurrentObject.GetComponent<SceneInfo>().TimeStep = float.Parse(TimeStep.text);
-        CurrentObject.GetComponent<SceneInfo>().GridSize = float.Parse(GridSize.text);
+        CurrentObject.GetComponent<SceneInfo>().Width = float.Parse(Width.text);
+        CurrentObject.GetComponent<SceneInfo>().Length = float.Parse(Length.text);
+        CurrentObject.GetComponent<SceneInfo>().Height = float.Parse(Height.text);
+        CurrentObject.GetComponent<SceneInfo>().PlayerX = float.Parse(PlayerX.text);
+        CurrentObject.GetComponent<SceneInfo>().PlayerY = float.Parse(PlayerY.text);
+
 
         // Inactivate the current scene and its associated object buttons, then set current scene to this scene.
         GameObject CurrentScene = gamemanager.GetComponent<DesignSceneGameManager>().GetCurrentScene();
