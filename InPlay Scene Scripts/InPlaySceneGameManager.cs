@@ -16,6 +16,8 @@ public class InPlaySceneGameManager : MonoBehaviour {
     public bool ScenarioLoaded = false;
 
     public Text InterfaceDensity;
+    public Text InterfaceHealthText;
+    public GameObject InterfaceHealthBar;
 
     private void Start()
     {

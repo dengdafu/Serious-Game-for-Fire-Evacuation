@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Model1 : MonoBehaviour {
 
     List<float> EffectiveTimeDensity;
+    float MaxDensity;
     Pedestrian PedestrianInfo = null;
     Player PlayerInfo = null;
 
@@ -23,16 +25,18 @@ public class Model1 : MonoBehaviour {
 
     // for player
     public Text DensityText;
+    public Text HealthText;
+    public GameObject HealthBar;
 
     // Use this for initialization
     void Start () {
         SceneInfo thisSceneInfo = this.gameObject.transform.parent.GetComponent<SceneInfo>();
         EffectiveTimeDensity = thisSceneInfo.EffectiveTimeDensity;
+        MaxDensity = Mathf.Max(EffectiveTimeDensity.ToArray());
         current_time = 0;
         domainWidth = Mathf.RoundToInt(thisSceneInfo.Width);
         domainLength = Mathf.RoundToInt(thisSceneInfo.Length);
         SimTime = thisSceneInfo.SimulationTime;
-
         InRangeWalls = new List<GameObject>();
         InRangeObstacles = new List<GameObject>();
         InRangeAgents = new List<GameObject>();
@@ -40,10 +44,18 @@ public class Model1 : MonoBehaviour {
 
         if (this.gameObject.tag == "Player")
         {
+            InPlaySceneGameManager gamemanager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<InPlaySceneGameManager>();
             if (DensityText == null)
             {
-                DensityText = 
-                    GameObject.FindGameObjectWithTag("GameManager").GetComponent<InPlaySceneGameManager>().InterfaceDensity;
+                DensityText = gamemanager.InterfaceDensity;
+            }
+            if (HealthText == null)
+            {
+                HealthText = gamemanager.InterfaceHealthText;
+            }
+            if (HealthBar == null)
+            {
+                HealthBar = gamemanager.InterfaceHealthBar;
             }
         }
 	}
@@ -100,6 +112,7 @@ public class Model1 : MonoBehaviour {
 		
 	}
 
+    // Smoke Human Interaction
     void SmokeToHuman()
     {
         Vector3 position = this.gameObject.transform.position;
@@ -117,11 +130,50 @@ public class Model1 : MonoBehaviour {
         {
             float Density = EffectiveTimeDensity[index];
             // Then use this density to do sth
+            float damage = (Density / MaxDensity) * 10; // Let's set damage in this way for now
+            // if it is a player:
+            // 1. reduce its health
+            // 2. change the interface accordingly
             if (this.tag == "Player")
             {
                 DensityText.text = Density.ToString();
+                Player PlayerInfo = this.GetComponent<Player>();
+                PlayerInfo.Health -= damage;
+
+                // if dead, go to evaluation scene;
+                if (PlayerInfo.Health <= 0)
+                {
+                    PlayerDeath();
+                }
+                HealthText.text = PlayerInfo.Health.ToString();
+                HealthBar.transform.localScale = new Vector3(PlayerInfo.Health / 100, 1, 1);
+            }
+            else if (this.tag == "Pedestrian")
+            {
+                Pedestrian PedInfo = this.GetComponent<Pedestrian>();
+                PedInfo.Health -= damage;
+
+                // if dead, destroy the pedestrian and maybe do something else
+                if (PedInfo.Health <= 0)
+                {
+                    PedestrianDeath();
+                }
             }
         }
+    }
+    void PlayerDeath()
+    {
+        SceneManager.LoadScene("Evaluation scene");
+    }
+    void PedestrianDeath()
+    {
+        Destroy(this.gameObject);
+    }
+
+    // Obstacle Human Interaction
+    void ObstacleToHuman()
+    {
+
     }
 
 }
